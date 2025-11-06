@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="ru.dip.table.editor.MultiPageTableEditor"
+            default="true"
+            extensions="table,html,rhtml"
+            id="ru.dip.table.editor"
+            name="%editor.table">
+         <contentTypeBinding
+               contentTypeId="org.eclipse.wst.html.core.htmlsource">
+         </contentTypeBinding>
+      </editor>
+   </extension>
+
+</plugin>

@@ -1,0 +1,5 @@
+<schema name="System Requirement" >
+	<field name="text" title="Текст" type="TEXT"/>
+	<field name="desc" title="Описание" type="TEXT"/>
+	<field name="rationale" title="Обоснование" type="TEXT"/>
+</schema>

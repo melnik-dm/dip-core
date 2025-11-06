@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<table is_root="true" pagebreak="EACH_FOLDER">
+<folder name="Changelog" numeration="false"/>
+<folder name="TOC" numeration="false"/>
+<folder name="Introduction"/>
+<folder name="Example"/>
+<folder name="References" numeration="false"/>
+<folder name="Appendix" numeration="false"/>
+</table>

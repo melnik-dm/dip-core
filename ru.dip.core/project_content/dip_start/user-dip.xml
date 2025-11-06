@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+<mime-type type="user/dip">
+<comment>DIP Project File</comment>
+<glob pattern="*.dip"/>
+</mime-type>
+</mime-info>

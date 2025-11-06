@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="ru.dip.requirement.nature"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="ru.dip.core.model.DipProject">
+         </run>
+      </runtime>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="ru.dip.core.test.IsRussianLanguageTester"
+            id="ru.dip.core.englishTester"
+            namespace="ru.dip"
+            properties="russian"
+            type="java.lang.Object">
+      </propertyTester>
+      <propertyTester
+            class="ru.dip.core.test.IsEnglishLanguageTester"
+            id="ru.dip.core.russianTester"
+            namespace="ru.dip"
+            properties="english"
+            type="java.lang.Object">
+      </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="ru.dip.core.utilities.md.UnityMdEditorFactory"
+            id="ru.dip.input.mdunity.factory">
+      </factory>
+   </extension>
+
+</plugin>

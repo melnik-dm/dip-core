@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<table description="Пример">
+<file name="Text.md"/>
+<file name="dia.plantuml"/>
+<file name="Table.csv"/>
+<file name="Table.table"/>
+</table>

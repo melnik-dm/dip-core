@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.compare.contentMergeViewers">
+      <viewer
+            class="ru.dip.merge.wraptext.WrapTextViewerCreator"
+            extensions="txt"
+            id="ru.dip.editors.merge.wrap_text"
+            label="Text Compare (Word Wrap)">
+      </viewer>
+      <contentTypeBinding
+            contentMergeViewerId="ru.dip.editors.merge.wrap_text"
+            contentTypeId="ru.dip.editors.content-type.md">
+      </contentTypeBinding>
+   </extension>
+
+</plugin>

@@ -1,0 +1,3 @@
+<schema name="Источник" extension="bib">
+	<field name="book" title="Идентификатор" type="TEXT"/>
+</schema>

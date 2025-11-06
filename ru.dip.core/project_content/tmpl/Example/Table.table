@@ -1,0 +1,18 @@
+<table style="border-collapse: collapse; width: 99.857752%;" border="1">
+<tbody>
+<tr>
+<td style="width: 32.328392%;">Заголовок 1</td>
+<td style="width: 32.328392%;">Заголовок 2</td>
+<td style="width: 32.328392%;">Заголовок 3</td>
+</tr>
+<tr>
+<td style="width: 32.328392%;">Текст&nbsp;</td>
+<td style="width: 32.328392%;">Текст</td>
+<td style="width: 32.328392%;" rowspan="2">Текст<br />Текст</td>
+</tr>
+<tr>
+<td style="width: 32.328392%;">Текст</td>
+<td style="width: 32.328392%;">Текст</td>
+</tr>
+</tbody>
+</table>

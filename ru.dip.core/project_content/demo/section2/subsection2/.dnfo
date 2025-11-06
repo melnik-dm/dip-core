@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<table description="Другой из подразделов">
+    
+    <file name="req1.sysreq"/>
+    
+    <file name="req2.sysreq"/>
+    
+    <file name="req3.sysreq"/>
+    
+</table>

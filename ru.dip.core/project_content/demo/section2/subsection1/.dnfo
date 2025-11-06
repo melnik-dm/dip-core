@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<table description="Один из подразделов">
+    
+    <file name="req1.req"/>
+    
+    <file name="req2.req"/>
+    
+</table>

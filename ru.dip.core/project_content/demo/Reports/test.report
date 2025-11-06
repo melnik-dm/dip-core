@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<report desc="Требования">
+
+<entry title="Предложенные требования" bounds="section2/*">
+<rule ext="req" bounds="section2/subsection1/*">
+status == "предложено"
+</rule>
+</entry>
+
+<entry title="Требования к функционалу, принятые">
+<rule ext="req">
+status == "принято" and type == "функциональное"
+</rule>
+</entry>
+
+</report>
+
