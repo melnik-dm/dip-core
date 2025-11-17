@@ -66,8 +66,8 @@ Export-Package: org.commonmark.node,
  ru.dip.core.utilities.ui.viewer,
  ru.dip.core.utilities.xml
 Bundle-ClassPath: .,
- libs/commonmark-0.18.1.jar,
- libs/plantuml.jar
+ libs/plantuml.jar,
+ libs/commonmark.jar
 Automatic-Module-Name: ru.dip.core
 Import-Package: ru.dip.core.model.finder,
  ru.dip.core.model.interfaces
