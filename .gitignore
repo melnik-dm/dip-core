@@ -1,1 +1,4 @@
 .project
+ru.dip.core/libs/*
+ru.dip.ktable/libs/*
+ru.dip.table/js/*
