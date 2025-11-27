@@ -11,16 +11,18 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  *******************************************************************************/
-package ru.dip.ui.export;
+package ru.dip.core.external.editors;
 
-public enum ExportVersion {
+import org.eclipse.core.resources.IFile;
+import org.eclipse.ui.IWorkbenchPart;
 
-	JAVA, PYTHON, BOTH;
-	
-	public final static String PYTHON_VERSION = "Python Version";
-	public final static String JAVA_VERSION = "Java Version";
-	
-	public static int JAVA_VER_INDEX = JAVA.ordinal();
-	public static int PYTHON_VER_INDEX = PYTHON.ordinal();
-	
+/**
+ * Расширение редактора, который отображается в DipRender как html
+ */
+public interface IDipHtmlRenderExtension extends IWorkbenchPart {
+
+	String getHtmlPresentation();
+
+	IFile getFile();
+
 }

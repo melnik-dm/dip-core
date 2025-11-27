@@ -121,4 +121,7 @@ public class Variable implements IDipElement {
 		return fVarContainer.canRename();
 	}
 
+	@Override
+	public void dispose() {}
+
 }

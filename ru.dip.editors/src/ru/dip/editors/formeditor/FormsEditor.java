@@ -42,13 +42,13 @@ import ru.dip.core.model.interfaces.IDipElement;
 import ru.dip.core.schema.SchemaReader;
 import ru.dip.core.unit.form.FormPresentation;
 import ru.dip.core.utilities.DipUtilities;
+import ru.dip.core.utilities.EditorUtils;
 import ru.dip.core.utilities.WorkbenchUtitlities;
 import ru.dip.editors.Messages;
 import ru.dip.editors.formeditor.fieldpage.FieldsPage;
 import ru.dip.editors.formeditor.model.FormModel;
 import ru.dip.editors.formeditor.xml.FormTextEditor;
 import ru.dip.editors.md.ISaveNotifier;
-import ru.dip.editors.md.MDEditor;
 import ru.dip.ui.dialog.DefaultSchemaMessage;
 
 public class FormsEditor extends  FormEditor implements IGotoMarker, ISaveNotifier {
@@ -213,7 +213,7 @@ public class FormsEditor extends  FormEditor implements IGotoMarker, ISaveNotifi
 	}
 	
 	private void fireSave() {
-		super.firePropertyChange(MDEditor.SAVE_EVENT);
+		super.firePropertyChange(EditorUtils.SAVE_EVENT);
 	}
 	
 	//=======================

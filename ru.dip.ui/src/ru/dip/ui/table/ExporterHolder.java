@@ -17,8 +17,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 import ru.dip.core.model.DipProject;
-import ru.dip.ui.export.ExportElement;
-import ru.dip.ui.export.ExportPreprocessor;
+import ru.dip.ui.export.IExportElement;
+import ru.dip.ui.export.IExportPreprocessor;
 import ru.dip.ui.export.diff.DiffExportPreprocessor;
 import ru.dip.ui.export.error.IExportError;
 
@@ -38,15 +38,17 @@ public class ExporterHolder {
 		/**
 		 * Возвращает путь до файла с результатом
 		 */
-		String export(DipProject project, Path partsPath, Path configPath, ExportPreprocessor preprocessor, int files) throws Exception;
+		String export(DipProject project, Path partsPath, Path configPath, IExportPreprocessor preprocessor, int files) throws Exception;
 		
 		String diffExport(DipProject project, Path partsPath, Path configPath, DiffExportPreprocessor preprocessor) throws Exception;
 		
-		String convertHtml(String output, ExportElement unit);
+		String convertHtml(String output, IExportElement unit);
 
 		void createGlossary(String output, DipProject project);
 
-		List<IExportError> getExportErrors();	
+		List<IExportError> getExportErrors();
+
+		void clear();	
 	}
 	
 	private IExporter fExporter;

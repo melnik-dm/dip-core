@@ -118,6 +118,9 @@ public abstract class DipElement implements IDipElement, IDescriptionSupport, IC
 	}
 	
 	@Override
+	public void dispose() {}
+	
+	@Override
 	public String id() {
 		if (DipUtilities.inIncludeFolder(this)) {
 			return DipUtilities.includeElementFullID(this);

@@ -11,14 +11,16 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  *******************************************************************************/
-package ru.dip.core.unit;
+package ru.dip.core.external.editors;
 
-import ru.dip.core.model.interfaces.IDipUnit;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.IWorkbenchPart;
 
-public class JsonPresentation extends TextPresentation {
+/**
+ * Расширение редактора, который отображается в DipRender как Image
+ */
+public interface IDipImageRenderExtension extends IWorkbenchPart {
 	
-	public JsonPresentation(IDipUnit unit) {
-		super(unit);
-	}
+	Image renderImage();
 
 }

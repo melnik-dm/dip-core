@@ -522,4 +522,7 @@ public class GlossaryFolder implements IParent {
 		return false;
 	}
 
+	@Override
+	public void dispose() {}
+
 }

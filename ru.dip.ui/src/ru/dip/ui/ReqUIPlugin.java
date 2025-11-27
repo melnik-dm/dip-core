@@ -13,7 +13,11 @@
  *******************************************************************************/
 package ru.dip.ui;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.Dialog;
@@ -27,7 +31,6 @@ import org.osgi.framework.BundleContext;
 
 import ru.dip.core.model.DipContainer;
 import ru.dip.core.model.DipProject;
-import ru.dip.core.model.DipRoot;
 import ru.dip.core.model.interfaces.IDipElement;
 import ru.dip.core.utilities.DipUtilities;
 import ru.dip.core.utilities.ResourcesUtilities;
@@ -64,7 +67,8 @@ public class ReqUIPlugin extends AbstractUIPlugin {
 	// The shared instance
 	private static ReqUIPlugin plugin;
 	
-	private boolean fShowReservedObjects = false;	
+	private boolean fShowReservedObjects = false;
+	private Set<IProject> fCheckedDuplicatesProjects = new HashSet<> ();
 	
 	/**
 	 * The constructor
@@ -116,17 +120,19 @@ public class ReqUIPlugin extends AbstractUIPlugin {
 			@Override
 			public void partVisible(IWorkbenchPartReference partRef) {
 				if (DipTableEditor.EDITOR_ID.equals(partRef.getId())) {
-					for (DipProject project : DipRoot.getInstance().getProjects()) {
-						checkProjectDuplicateNames(project);
-					}
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().removePartListener(this);
+					DipTableEditor editor = (DipTableEditor) partRef.getPart(false);
+					DipProject dipProject = editor.getDipProject();
+					checkProjectDuplicateNames(dipProject);
 				}
 			}
 		});
 	}
-	
+		
 	private void checkProjectDuplicateNames(DipProject dipProject) {
-		checkDuplicateNames(dipProject);
+		if (!fCheckedDuplicatesProjects.contains(dipProject.getProject())) {
+			checkDuplicateNames(dipProject);
+			fCheckedDuplicatesProjects.add(dipProject.getProject());
+		}
 	}
 
 	private void checkDuplicateNames(DipContainer container) {		

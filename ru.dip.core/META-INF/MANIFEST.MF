@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Dip Core
 Bundle-SymbolicName: ru.dip.core;singleton:=true
-Bundle-Version: 2.6.14
+Bundle-Version: 2.6.16
 Bundle-Activator: ru.dip.core.DipCorePlugin
 Bundle-License: https://www.eclipse.org/legal/epl-2.0/
 Require-Bundle: org.eclipse.ui,
@@ -25,6 +25,7 @@ Export-Package: org.commonmark.node,
  ru.dip.core,
  ru.dip.core.csv.model,
  ru.dip.core.exception,
+ ru.dip.core.external.editors,
  ru.dip.core.form,
  ru.dip.core.form.control,
  ru.dip.core.form.model,
@@ -46,6 +47,7 @@ Export-Package: org.commonmark.node,
  ru.dip.core.schema,
  ru.dip.core.table,
  ru.dip.core.unit,
+ ru.dip.core.unit.factory,
  ru.dip.core.unit.form,
  ru.dip.core.unit.md,
  ru.dip.core.utilities,
@@ -66,8 +68,8 @@ Export-Package: org.commonmark.node,
  ru.dip.core.utilities.ui.viewer,
  ru.dip.core.utilities.xml
 Bundle-ClassPath: .,
- libs/plantuml.jar,
- libs/commonmark.jar
+ libs/commonmark.jar,
+ libs/plantuml.jar
 Automatic-Module-Name: ru.dip.core
 Import-Package: ru.dip.core.model.finder,
  ru.dip.core.model.interfaces

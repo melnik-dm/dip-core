@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 
 import ru.dip.core.model.interfaces.IDipUnit;
-import ru.dip.core.utilities.ui.swt.ImageUtilities;
+import ru.dip.core.utilities.ui.image.ImageUtilities;
 
 public abstract class ZoomImagePresentation extends TablePresentation {
 
@@ -91,6 +91,12 @@ public abstract class ZoomImagePresentation extends TablePresentation {
 			fZoomImage.dispose();
 			fZoomImage = null;
 		}
+	}
+	
+	@Override
+	protected void dispose() {
+		disposeZoomImage();
+		super.dispose();
 	}
 	
 }

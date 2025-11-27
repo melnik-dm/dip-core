@@ -43,6 +43,8 @@ public interface IDipElement extends IAdaptable, IDipProjectHolder {
 	
 	boolean canRename();
 	
+	void dispose();
+	
 	//=====================
 	// child-parent
 
@@ -62,5 +64,7 @@ public interface IDipElement extends IAdaptable, IDipProjectHolder {
 	boolean isIncluded();
 	
 	void setIncluded(boolean value);
+
+
 		
 }

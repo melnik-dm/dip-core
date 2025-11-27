@@ -45,10 +45,13 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.TextOperationAction;
 
 import ru.dip.core.DipCorePlugin;
+import ru.dip.core.external.editors.IDipHtmlRenderExtension;
 import ru.dip.core.model.DipProject;
 import ru.dip.core.model.DipUnit;
 import ru.dip.core.model.interfaces.IDipElement;
 import ru.dip.core.utilities.DipUtilities;
+import ru.dip.core.utilities.EditorUtils;
+import ru.dip.core.utilities.UmlUtilities;
 import ru.dip.core.utilities.ui.WSelectionListener;
 import ru.dip.editors.Messages;
 import ru.dip.editors.md.MarkdownDocument.MdDocumentListener;
@@ -62,7 +65,7 @@ import ru.dip.ui.preferences.MdPreferences;
 import ru.dip.ui.preferences.MdPreferences.MdPreferenciesListener;
 
 public class MDEditor extends TextEditor implements MdPreferenciesListener, IDocumentListener, MdDocumentListener,
-		ISaveNotifier, IMdEditor, ICommentManagerHolder {
+		ISaveNotifier, IMdEditor, ICommentManagerHolder, IDipHtmlRenderExtension {
 
 	public static final String ID = Messages.MDEditor_ID;
 	public static final String MD_CONTEXT = "ru.dip.editors.context.mdeditor";
@@ -70,10 +73,6 @@ public class MDEditor extends TextEditor implements MdPreferenciesListener, IDoc
 	public static final String ANNOTATION_BOLD = Messages.MDEditor_BoldTypeID;
 	public static final String ANNOTATION_ITALIC = Messages.MDEditor_ItalicTypeID;
 
-	public static final int SAVE_EVENT = 88;
-	public static final int VISIBLE_EVENT = 89;
-	public static final int HIDE_EVENT = 90;
-	
 	private IDocument fDocument;
 	private DipUnit fDipUnit;
 	private IFile fFile;
@@ -276,7 +275,7 @@ public class MDEditor extends TextEditor implements MdPreferenciesListener, IDoc
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		firePropertyChange(SAVE_EVENT);
+		firePropertyChange(EditorUtils.SAVE_EVENT);
 	}
 	
 	@Override
@@ -288,17 +287,6 @@ public class MDEditor extends TextEditor implements MdPreferenciesListener, IDoc
 	public void dispose() {	
 		MdPreferences.instance().removeListener(this);
 		super.dispose();
-	}
-	
-	//==================
-	// events
-	
-	public void visible() {
-		firePropertyChange(VISIBLE_EVENT);
-	}
-
-	public void hide() {
-		firePropertyChange(HIDE_EVENT);
 	}
 
 	@Override
@@ -359,6 +347,11 @@ public class MDEditor extends TextEditor implements MdPreferenciesListener, IDoc
 		fCurrentLastTimeStamp++;
 	}
 	
+	@Override
+	public String getHtmlPresentation() {
+		return UmlUtilities.getHtmlFromMDText(fFile, fDipUnit);
+	}
+	
 	//==================
 	// getters
 	
@@ -408,5 +401,10 @@ public class MDEditor extends TextEditor implements MdPreferenciesListener, IDoc
 	public StyledText styledText() {
 		return textWidget();
 	}
-	
+
+	@Override
+	public IFile getFile() {
+		return fFile;
+	}
+
 }

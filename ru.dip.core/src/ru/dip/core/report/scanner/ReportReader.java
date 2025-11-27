@@ -51,7 +51,7 @@ public class ReportReader {
 		fPartitioner.connect(fDocument);
 		fDocument.setDocumentPartitioner(fPartitioner);
 		fModel = new RulesModel(fDocument);
-		fModel.createModel();	
+		fModel.createModel();
 	}
 	
 	public List<ReportEntry> getEntries(){

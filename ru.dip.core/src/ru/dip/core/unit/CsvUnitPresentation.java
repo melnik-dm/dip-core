@@ -29,7 +29,7 @@ import ru.dip.core.model.interfaces.IDipUnit;
 import ru.dip.core.utilities.FileUtilities;
 import ru.dip.core.utilities.TagStringUtilities;
 import ru.dip.core.utilities.text.Terms;
-import ru.dip.core.utilities.ui.swt.ImageUtilities;
+import ru.dip.core.utilities.ui.image.ImageUtilities;
 
 public class CsvUnitPresentation extends ZoomImagePresentation {
 

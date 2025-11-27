@@ -32,8 +32,8 @@ import ru.dip.core.utilities.FileUtilities;
 import ru.dip.core.utilities.HtmlUtilities;
 import ru.dip.core.utilities.TagStringUtilities;
 import ru.dip.core.utilities.text.Terms;
+import ru.dip.core.utilities.ui.image.ImageUtilities;
 import ru.dip.core.utilities.ui.swt.ColorProvider;
-import ru.dip.core.utilities.ui.swt.ImageUtilities;
 
 public class HtmlUnitPresentation extends ZoomImagePresentation {
 
@@ -92,14 +92,14 @@ public class HtmlUnitPresentation extends ZoomImagePresentation {
 			}			
 			String newText = getHtmlWithWidth(fText, width);
 			if (newText != null) {
-				fText = newText;			
-				Image image = ImageUtilities.createImageFromHtml(fText, getUnit().resource()); 
-				super.trimImage(width, image);				
+				fText = newText;
+				Image image = ImageUtilities.createImageFromHtml(fText, getUnit().resource());
+				super.trimImage(width, image);
 			}
 		} catch (Exception e) {
 			DipCorePlugin.logError(e, "Create html image error " + getUnit());
 			e.printStackTrace();
-		}	
+		}
 	}
 	
 	protected String getHtmlWithWidth(String text, int width) {

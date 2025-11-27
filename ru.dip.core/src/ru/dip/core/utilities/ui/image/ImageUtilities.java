@@ -11,7 +11,7 @@
  * SPDX-License-Identifier: EPL-2.0
  *
  *******************************************************************************/
-package ru.dip.core.utilities.ui.swt;
+package ru.dip.core.utilities.ui.image;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -59,23 +59,22 @@ public class ImageUtilities {
 	}
 	
 	public static Image trimImageByWidth(int width, Image image){	
-		int imageWidth = image.getBoundsInPixels().width;
+		int imageWidth = image.getBounds().width;
 		double k = (double) width / imageWidth;
 		int height = (int) (image.getBounds().height * k);
 		return ImageUtilities.getResizedImage(image, width, height);		
 	}
 	
 	public static Image trimImageByHeight(int height, Image image){	
-		int imageHeight= image.getBoundsInPixels().height;
+		int imageHeight= image.getBounds().height;
 		double k = (double) height / imageHeight;
 		int width = (int) (image.getBounds().width * k);
 		return ImageUtilities.getResizedImage(image, width, height);		
 	}
 	
 	public  static Image createImageFromHtml(String HTML, IFile ifile) throws Exception {
-		/*		
 		// old version
-		String filename = ifile.getLocation().toOSString();
+		/*String filename = ifile.getLocation().toOSString();
 		JEditorPane jep = new JEditorPane("text/html", HTML);
 		Dimension dim = jep.getPreferredSize();
 		BufferedImage image = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice()
@@ -91,7 +90,9 @@ public class ImageUtilities {
 			return result;
 		}
 		return null;*/
-		return createImageFromHtml(HTML);
+		//return null;*/
+		Image image = createImageFromHtml(HTML);
+		return image != null ? image : CoreImageProvider.getImage();
 	}
 	
 	public  static Image createImageFromHtml(String HTML) {
@@ -102,11 +103,15 @@ public class ImageUtilities {
 		Graphics graphics = image.createGraphics();
 		jep.setSize(dim.width, dim.height);
 		jep.print(graphics);	
-		ImageData imageData = convertToSWT(image);	
+		ImageData imageData = convertToSWT(image);
+		jep.setEnabled(false);
+		jep.setVisible(false);
+
 		try {
-			return new Image(null, imageData);
+			return new Image(Display.getDefault(), imageData);
 		} catch (Exception e) {
 			// 
+			e.printStackTrace();
 			return null;
 		}
 	}

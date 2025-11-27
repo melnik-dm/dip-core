@@ -182,6 +182,9 @@ public class IncludeFolder extends DipFolder {
 	}
 	
 	public String realtiveProjectIncludeName() {
+		if (resource() == null) {
+			return parent().resource().getProjectRelativePath() + "/" + includeName();
+		}
 		IPath projectRelative = resource().getProjectRelativePath();
 		projectRelative = projectRelative.removeLastSegments(1).append(includeName());
 		return projectRelative.toOSString();

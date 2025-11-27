@@ -184,4 +184,7 @@ public class FolderVarContainer implements IVarContainer, IDipElement {
 		fVarContainer.refresh();
 	}
 
+	@Override
+	public void dispose() {}
+
 }

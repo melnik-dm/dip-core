@@ -57,6 +57,14 @@
             id="ru.dip.editors.xml.editor"
             name="XML Редактор">
       </editor>
+      <editor
+            class="ru.dip.editors.dot.DotEditor"
+            contributorClass="ru.dip.editors.dot.DotEditorContributor"
+            default="true"
+            extensions="dot"
+            id="ru.dip.editors.doteditor"
+            name="%editor.dot">
+      </editor>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -179,14 +187,6 @@
          <command
                id="ru.dip.editors.incorrectlinks.check"
                name="Check Links">
-         </command>
-         <command
-               id="ru.dip.editors.json.validate"
-               name="Validate">
-         </command>
-         <command
-               id="ru.dip.editors.json.validate"
-               name="Json Schema Validate">
          </command>
          <command
                id="ru.dip.editors.command.bold"
@@ -435,10 +435,6 @@
                  commandId="ru.dip.editors.add_comment">
            </handler>
            <handler
-                 class="ru.dip.editors.json.ValidateBySchemaHandler"
-                 commandId="ru.dip.editors.json.validate">
-           </handler>
-           <handler
                  class="ru.dip.editors.md.handlers.BoldCommandHandler"
                  commandId="ru.dip.editors.command.bold">
            </handler>
@@ -480,38 +476,11 @@
                  id="ru.dip.editors.merge.form"
                  label="Form">
            </viewer>
-           <contentTypeBinding
-                 contentMergeViewerId="ru.dip.editors.merge.form2"
-                 contentTypeId="ru.dip.editors.contenttype.form">
-           </contentTypeBinding>
-           <viewer
-                 class="ru.dip.editors.merge.wraptext.WrapTextViewerCreator"
-                 extensions="req"
-                 id="ru.dip.editors.merge.form2"
-                 label="Form (Text View)">
-           </viewer>
            <viewer
                  class="ru.dip.editors.merge.dia.MergeDiaViewerCreator"
                  extensions="dia"
                  id="ru.dip.editors.merge.dia">
            </viewer>
-        </extension>
-        <extension
-              id="id1"
-              name="name"
-              point="org.eclipse.wst.validation.validatorV2">
-           <validator
-                 build="true"
-                 class="ru.dip.editors.json.JsonValidator"
-                 manual="true">
-              <include>
-                 <rules>
-                    <fileext
-                          ext="json">
-                    </fileext>
-                 </rules>
-              </include>
-           </validator>
         </extension>
         <extension
               point="org.eclipse.ui.startup">

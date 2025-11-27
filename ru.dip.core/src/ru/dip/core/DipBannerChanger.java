@@ -18,6 +18,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import ru.dip.core.utilities.ResourcesUtilities;
@@ -64,7 +66,7 @@ public class DipBannerChanger {
 			// remove files (не нужные)
 			removeWindowIcons(dipPluginPath);
 			// изменение конфигурации
-			//changeSplashConfiguration(eclipsePath);
+			changeSplashConfiguration(eclipsePath);
 	
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -116,6 +118,25 @@ public class DipBannerChanger {
 				Files.delete(removeFilePath);
 			}
 		}	
+	}
+	
+	
+	private void changeSplashConfiguration(Path dipPluginPath) throws IOException {
+		Path configPath = dipPluginPath.resolve("configuration").resolve("config.ini");
+		DipCorePlugin.logInfo("configPath: " + configPath);
+		if (!Files.exists(configPath)) {
+			return ;
+		}	
+		List<String> lines = Files.readAllLines(configPath);
+		List<String> result = new ArrayList<String>();
+		for (String line: lines) {
+			if (line.startsWith("osgi.splashPath=platform\\:/base/plugins/pro.wisetech.splash")) {
+				result.add("osgi.splashPath=platform\\:/base/plugins/dip01");
+			} else {
+				result.add(line);
+			}
+		}
+		Files.write(configPath, result);
 	}
 	
 	

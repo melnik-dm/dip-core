@@ -145,4 +145,8 @@ public class GlossaryField implements IDipElement {
 		return false;
 	}
 
+	@Override
+	public void dispose() {		
+	}
+
 }

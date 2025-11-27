@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Requiremnt UI
 Bundle-SymbolicName: ru.dip.ui;singleton:=true
-Bundle-Version: 2.6.14
+Bundle-Version: 2.6.16
 Bundle-License: https://www.eclipse.org/legal/epl-2.0/
 Bundle-Localization: plugin
 Bundle-Activator: ru.dip.ui.ReqUIPlugin
@@ -35,7 +35,8 @@ Require-Bundle: org.eclipse.ui,
  com.google.gson
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
-Export-Package: ru.dip.ui,
+Export-Package: de.kupzog.ktable,
+ ru.dip.ui,
  ru.dip.ui.action.hyperlink,
  ru.dip.ui.action.open,
  ru.dip.ui.dialog,
@@ -63,5 +64,6 @@ Export-Package: ru.dip.ui,
  ru.dip.ui.utilities.ui,
  ru.dip.ui.utilities.xml,
  ru.dip.ui.variable
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ libs/KTable.jar
 Automatic-Module-Name: ru.dip.ui

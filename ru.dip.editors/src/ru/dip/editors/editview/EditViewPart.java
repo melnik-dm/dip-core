@@ -44,8 +44,6 @@ import ru.dip.core.utilities.DipUtilities;
 import ru.dip.editors.Messages;
 import ru.dip.editors.formeditor.FormsEditor;
 import ru.dip.editors.md.MDEditor;
-import ru.dip.editors.report.ReportEditor;
-import ru.dip.table.editor.MultiPageTableEditor;
 import ru.dip.ui.table.editor.DipTableEditor;
 
 public class EditViewPart extends ViewPart implements IPropertyListener, IFolderDirtyListener {
@@ -102,7 +100,6 @@ public class EditViewPart extends ViewPart implements IPropertyListener, IFolder
 				}
 			}
 		});
-
 	}
 	
 	private void updateWithEditor(DipTableEditor editor) {	
@@ -249,21 +246,12 @@ public class EditViewPart extends ViewPart implements IPropertyListener, IFolder
 	
 	private IEditorPart createEditor(IFile file) {			
 			UnitType unitType = fCurrentDipUnit.getUnitType();
-			if (unitType == UnitType.FORM) {
-				return new FormsEditor();
-			} else if (unitType == UnitType.TEXT) {
-				return new TextEditor();
-			} else if (unitType == UnitType.MARKDOWN) {
-				return new MDEditor();
-			} else if (unitType == UnitType.TABLE) {
-				return new MultiPageTableEditor();
-			} else if (unitType == UnitType.REPROT_REF) {
+			if (unitType == UnitType.REPROT_REF) {
 				ReportRefPresentation presentation =  (ReportRefPresentation) fCurrentDipUnit.getUnitPresentation().getPresentation();
 				fCurrentFile = presentation.getReportFile();
 				setPartName(fCurrentFile.getName());
-				return new ReportEditor();
-			}				
-		return null;
+			}
+			return EditorFactory.createEditor(unitType);
 	}
 	
 	private synchronized void initEditor() {

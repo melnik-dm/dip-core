@@ -71,7 +71,6 @@ public class FormField extends AbstractFormField {
 	public String getContent() {
 		String content = getField().getValue();
 		return TextPresentation.prepareText(content, getDipUnit());
-
 	}
 	
 	// ======================

@@ -237,14 +237,6 @@ public class DipProject extends DipTableContainer implements IDipParent, IProjec
 			Shell shell =  PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 			createNewVariablesContainer(shell);
 		}
-		updateNumeration();
-
-		// обработать дочерние элементы
-		for (IDipDocumentElement dipDocumentElement: getDipDocumentChildren()) {
-			if (dipDocumentElement instanceof DipTableContainer) {							
-				((DipTableContainer) dipDocumentElement).computeChildren();
-			}			
-		}
 		
 		// если есть папка Reports (объект ProjectReportFolder) - то ее обработать
 		if (fMainReportFolder instanceof ProjectReportFolder) {
@@ -302,7 +294,7 @@ public class DipProject extends DipTableContainer implements IDipParent, IProjec
 	public void updateNumeration() {
 		updateTableNumbers();
 		updateImageNumbers();
-		updateDipNumbers();
+		updateFormNumbers();
 	}
 	
 	@Override
@@ -377,21 +369,21 @@ public class DipProject extends DipTableContainer implements IDipParent, IProjec
 		}
 	}
 	
-	private void updateDipNumbers(){
+	private void updateFormNumbers(){
 		fDipNumbers = new HashMap<>();
-		clearDipNumbers();
-		updateDipNumbers(this);
+		clearFormNumbers();
+		updateFormNumbers(this);
 	}
 	
-	private void clearDipNumbers() {
+	private void clearFormNumbers() {
 		fDipNumbers = new HashMap<>();
 		getSchemaModel().getAllExtensions().forEach((ext) -> fDipNumbers.put(ext, new ArrayList<>()));
 	}
 	
-	private void updateDipNumbers(IDipParent parent){		
+	private void updateFormNumbers(IDipParent parent){		
 		for (IDipDocumentElement dipDocumentElement : parent.getDipDocChildrenList()) {
 			if (dipDocumentElement instanceof IDipParent) {
-				updateDipNumbers((IDipParent) dipDocumentElement);
+				updateFormNumbers((IDipParent) dipDocumentElement);
 			} else if (dipDocumentElement instanceof DipUnit) {
 				DipUnit unit = (DipUnit) dipDocumentElement;
 				if ((unit.getUnitType().isForm())) {

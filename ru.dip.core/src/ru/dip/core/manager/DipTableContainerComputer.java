@@ -235,6 +235,7 @@ public class DipTableContainerComputer {
 		java.nio.file.Path linksPath = Paths.get(entry.getLink());
 		java.nio.file.Path resolve = thisPath.resolve(linksPath);
 		java.nio.file.Path relative = resolve.normalize();
+
 		IFolder folder = null;
 		try {
 			folder = IncludeFolder.createLinkFolder(entry.getName(), relative.toString(), fDipContainer.resource());
@@ -242,7 +243,7 @@ public class DipTableContainerComputer {
 			e.printStackTrace();
 		}
 		if (folder == null) {
-			return IncludeFolder.createBrokenLinkFolder(relative.toString(), fDipContainer);
+			return IncludeFolder.createBrokenLinkFolder(entry.getLink(), fDipContainer);
 		} else {
 			return IncludeFolder.instance(folder, fDipContainer);
 		}

@@ -201,6 +201,7 @@ public class TableWriter {
 		transformer.transform(dom_source, result);		
 		List<String> lines = TagStringUtilities.removeEmptyStirng(writer.toString());
 		Files.write(Paths.get(path), lines, StandardCharsets.UTF_8);
+		writer.close();
 	}
 	
 }

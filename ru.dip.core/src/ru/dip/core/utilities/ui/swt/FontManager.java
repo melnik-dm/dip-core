@@ -13,7 +13,6 @@
  *******************************************************************************/
 package ru.dip.core.utilities.ui.swt;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
@@ -39,7 +38,7 @@ public class FontManager {
 	static {
 		try {			
 			Method method = Font.class.getMethod("setNonDisposeHandler", Consumer.class);
-			method.invoke(null, new Consumer[] {null});
+			method.invoke(null, new Object[] {null});
 		} catch (NoSuchMethodException e)  {
 			DipCorePlugin.logInfo("FONT OLD VERSION (No setNonDisposeHandler method)");
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {

@@ -195,4 +195,8 @@ public class ReportContainer implements IReportContainer {
 	public <T> T getAdapter(Class<T> adapter) {
 		return null;
 	}
+
+	@Override
+	public void dispose() {		
+	}
 }

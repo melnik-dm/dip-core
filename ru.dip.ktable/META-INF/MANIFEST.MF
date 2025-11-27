@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ktable
 Bundle-SymbolicName: ru.dip.ktable;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.1
 Bundle-License: https://www.eclipse.org/legal/epl/epl-v10.html
 Automatic-Module-Name: ru.dip.ktable
 Bundle-RequiredExecutionEnvironment: JavaSE-11

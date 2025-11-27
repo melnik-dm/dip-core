@@ -88,14 +88,7 @@ public class FormsEditorActionBarContributor extends MultiPageEditorActionBarCon
 	@Override
 	public void setActiveEditor(IEditorPart activeEditor) {
 		IActionBars actionBars = getActionBars();
-		IWorkbenchPart page = null;
-		
-		if (activeEditor instanceof FormsEditor) {
-			page = getPage().getActiveEditor(); // должен быть именно из getPage (из параметра не подойдет, не работают UndoAction)
-		} else {
-			// для DIP Edit
-			page = activeEditor;
-		}
+		IWorkbenchPart page = activeEditor;
 		if (actionBars != null && page instanceof FormsEditor) {
 			fReqEditor = (FormsEditor) page;
 			fRedoAction = new RedoAction(fReqEditor);

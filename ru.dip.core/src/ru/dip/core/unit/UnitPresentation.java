@@ -24,89 +24,40 @@ import ru.dip.core.model.finder.FindSettings;
 import ru.dip.core.model.finder.IFindedIdPoints;
 import ru.dip.core.model.interfaces.IDipUnit;
 import ru.dip.core.model.interfaces.IUnitPresentation;
+import ru.dip.core.unit.factory.IPresentationFactory;
+import ru.dip.core.unit.factory.PresentationFactoryProvider;
 import ru.dip.core.unit.form.FormPresentation;
-import ru.dip.core.unit.md.MarkDownPresentation;
-import ru.dip.core.unit.md.SubMarkdownPresentation;
 import ru.dip.core.utilities.TagStringUtilities;
 
 public class UnitPresentation extends UnitExtension implements IUnitPresentation, IFindedIdPoints {
 
 	private UnitType fUnitType;
-	private TablePresentation fTablePresentation;
-	
+
 	public UnitPresentation(IDipUnit element) {
 		super(element);
 	}
-
+	
+	public IFile getFile() {
+		return getDipUnit().resource();
+	}
+	
 	@Override
 	public TablePresentation getPresentation(){
-		if (fTablePresentation == null){
-			fTablePresentation = createTablePresentation();			
+		TablePresentation tablePresentation = UnitPresentationCache.getPresentation(getFile());
+		if (tablePresentation == null) {
+			tablePresentation = createTablePresentation();
+			UnitPresentationCache.putPresentation(getFile(), tablePresentation);
 		}
-		return fTablePresentation;
+		return tablePresentation;
 	}
 	
 	private TablePresentation createTablePresentation(){
 		getUnitType();
-		IDipUnit unit = getDipUnit();		
-		switch (fUnitType){
-		case IMAGE:{
-			return new ImagePresentation(unit);
-		}
-		case TEXT:{
-			return new TextPresentation(unit);
-		}
-		case MARKDOWN:{
-			return new MarkDownPresentation(unit);
-		}
-		case SUBMARKDOWN:{
-			return new SubMarkdownPresentation(unit);
-		}
-		case HTML:{
-			return new HtmlUnitPresentation(unit);
-		}		
-		case CSV:{
-			return new CsvUnitPresentation(unit);
-		}
-		case TABLE:{
-			return new TableUnitPresentation(unit);
-		}		
-		case HTML_IMAGE:{
-			return new HtmlImagePresentation(unit);
-		}
-		case UML:{
-			return new PlantUmlPresentation(unit);
-		}
-		case DOT:{
-			return new DotPresentation(unit);
-		}
-		case DIA:{
-			return new DiaPresentation(unit);
-		}				
-		case FORM:{
-			return new FormPresentation(unit);
-		}
-		case REPROT_REF:{
-			return new ReportRefPresentation(unit);
-		}	
-		case TOC_REF:{
-			return new TocRefPresentation(unit);
-		}		
-		case GLOS_REF:{
-			return new GlossaryPresentation(unit);
-		}		
-		case CHANGELOG:{
-			return new ChangeLogPresentation(unit);
-		}
-		case PAGEBREAK:{
-			return new PagebreakPresentation(unit);
-		}
-		case JSON:{
-			return new JsonPresentation(unit);
-		}	
-		default:
-			break;
-		}
+		IDipUnit unit = getDipUnit();
+		IPresentationFactory factory = PresentationFactoryProvider.getFactory(fUnitType);
+		if (factory != null) {
+			return factory.createPresentation(unit);
+		}					
 		return null;
 	}
 	
@@ -125,11 +76,13 @@ public class UnitPresentation extends UnitExtension implements IUnitPresentation
 		return UnitType.defineUnitType(extension, fileName, dipProject());
 	}
 	
-	public void updatePresentation(){
+	public TablePresentation updatePresentation(){
 		if (defineUnitType() != fUnitType){
 			fUnitType = defineUnitType();
 		}
-		fTablePresentation = createTablePresentation();			
+		TablePresentation tablePresentation = createTablePresentation();
+		UnitPresentationCache.putPresentation(getFile(), tablePresentation);
+		return tablePresentation;
 	}
 	
 	//==============================
@@ -145,11 +98,10 @@ public class UnitPresentation extends UnitExtension implements IUnitPresentation
 		IDipUnit unit = getDipUnit();
 		fFindedIdPoints = TagStringUtilities.findWords(unit.name(), text, caseSensitive);
 		
-		if (fTablePresentation == null) {
-			updatePresentation();
-		}
-		if (fTablePresentation != null) {
-			boolean findPres = fTablePresentation.findWord(text, caseSensitive);
+		TablePresentation tablePresentation = getPresentation();
+		
+		if (tablePresentation != null) {
+			boolean findPres = tablePresentation.findWord(text, caseSensitive);
 			if (findPres) {
 				return findPres;
 			}
@@ -174,15 +126,13 @@ public class UnitPresentation extends UnitExtension implements IUnitPresentation
 			}
 		}
 		
-		if (fTablePresentation == null) {
-			updatePresentation();
-		}
+		TablePresentation tablePresentation = getPresentation();
 		int findedPresentation = 0;
-		if (fTablePresentation != null) {
-			if (fTablePresentation instanceof FormPresentation) {
-				findedPresentation = ((FormPresentation)fTablePresentation).findText(text, findSettings, settings);
+		if (tablePresentation != null) {
+			if (tablePresentation instanceof FormPresentation) {
+				findedPresentation = ((FormPresentation)tablePresentation).findText(text, findSettings, settings);
 			} else {			
-				findedPresentation = fTablePresentation.findText(text, findSettings);
+				findedPresentation = tablePresentation.findText(text, findSettings);
 			}
 		}
 		return findedId + findedPresentation;	
@@ -201,11 +151,10 @@ public class UnitPresentation extends UnitExtension implements IUnitPresentation
 			}
 		}
 		
-		if (fTablePresentation == null) {
-			updatePresentation();
-		}
-		if (fTablePresentation != null) {
-			boolean findPres = fTablePresentation.appendFind(text, caseSensitive);
+		TablePresentation tablePresentation = getPresentation();
+
+		if (tablePresentation != null) {
+			boolean findPres = tablePresentation.appendFind(text, caseSensitive);
 			if (findPres) {
 				return findPres;
 			}
@@ -225,11 +174,10 @@ public class UnitPresentation extends UnitExtension implements IUnitPresentation
 			}
 		}
 		
-		if (fTablePresentation == null) {
-			updatePresentation();
-		}
-		if (fTablePresentation != null) {
-			boolean findPres = fTablePresentation.appendWord(text, caseSensitive);
+		TablePresentation tablePresentation = getPresentation();
+
+		if (tablePresentation != null) {
+			boolean findPres = tablePresentation.appendWord(text, caseSensitive);
 			if (findPres) {
 				return findPres;
 			}
@@ -248,34 +196,32 @@ public class UnitPresentation extends UnitExtension implements IUnitPresentation
 	
 	@Override
 	public void cleanFind() {
-		fFindedIdPoints = null;		
-		if (fTablePresentation != null) {
-			fTablePresentation.cleanFind();
-		}
+		fFindedIdPoints = null;
+		UnitPresentationCache.applyIfExists(getFile(), TablePresentation::cleanFind);
 	}
 
 	@Override
 	public void removeIfFind(Collection<String> terms) {
 		getPresentation();
-		if (fTablePresentation != null) {			
-			fTablePresentation.removeIfFind(terms);
-		}
+		UnitPresentationCache.applyIfExists(getFile(), TablePresentation::cleanFind);
 	}
 	
 	@Override
 	public void findTerms(Set<String> terms) {
 		getPresentation();
-		if (fTablePresentation != null) {			
-			fTablePresentation.findTerms(terms);
-		}		
+		UnitPresentationCache.applyIfExists(getFile(), tp -> tp.findTerms(terms));
 	}
 	
 	@Override
 	public void findVars(Set<String> vars) {
-		getPresentation();
-		if (fTablePresentation != null) {			
-			fTablePresentation.findVars(vars);
+		TablePresentation tablePresentation = getPresentation();
+		if (tablePresentation != null) {			
+			tablePresentation.findVars(vars);
 		}			
+	}
+
+	@Override
+	public void dispose() {
 	}
 	
 }

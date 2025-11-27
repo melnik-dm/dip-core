@@ -51,6 +51,7 @@ import ru.dip.core.link.Link;
 import ru.dip.core.link.LinkInteractor;
 import ru.dip.core.model.DipProject;
 import ru.dip.core.unit.ReportRefPresentation;
+import ru.dip.core.utilities.EditorUtils;
 import ru.dip.core.utilities.ReportUtils;
 import ru.dip.core.utilities.WorkbenchUtitlities;
 import ru.dip.core.utilities.ui.CompositeBuilder;
@@ -58,7 +59,6 @@ import ru.dip.core.utilities.ui.image.DownRightOverlayImageIcon;
 import ru.dip.editors.Messages;
 import ru.dip.editors.formeditor.FormsEditor;
 import ru.dip.editors.md.ISaveNotifier;
-import ru.dip.editors.md.MDEditor;
 import ru.dip.ui.utilities.image.ImageProvider;
 
 public class IncorrectLinksView extends ViewPart implements IncorrectLinkChangeListener, IPropertyListener {
@@ -307,7 +307,7 @@ public class IncorrectLinksView extends ViewPart implements IncorrectLinkChangeL
 	
 	@Override
 	public void propertyChanged(Object source, int propId) {
-		if (propId == MDEditor.SAVE_EVENT) {
+		if (propId == EditorUtils.SAVE_EVENT) {
 			checkLinks() ;
 		}
 	}

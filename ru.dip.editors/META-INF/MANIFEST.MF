@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Editors
 Bundle-SymbolicName: ru.dip.editors;singleton:=true
-Bundle-Version: 2.6.14
+Bundle-Version: 2.6.16
 Bundle-License: https://www.eclipse.org/legal/epl-2.0/
 Bundle-Localization: plugin
 Bundle-Activator: ru.dip.editors.ReqEditorsPlugin
@@ -14,7 +14,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.resources,
  ru.dip.core,
  org.eclipse.ui.forms,
- org.eclipse.core.filesystem,
  org.eclipse.ui.workbench.texteditor,
  ru.dip.ui,
  org.eclipse.e4.core.contexts,
@@ -25,14 +24,10 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.egit.ui,
  org.eclipse.egit.core,
  org.eclipse.jgit,
- org.eclipse.team.ui,
- org.eclipse.wst.validation,
- com.ibm.icu,
- org.eclipse.core.expressions,
- org.eclipse.swt,
- ru.dip.ktable
+ org.eclipse.core.expressions
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
-Export-Package: ru.dip.editors.formeditor.fieldpage,
+Export-Package: ru.dip.editors.editview,
+ ru.dip.editors.formeditor.fieldpage,
  ru.dip.editors.formeditor.model,
  ru.dip.editors.report.xml
 Automatic-Module-Name: ru.dip.editors

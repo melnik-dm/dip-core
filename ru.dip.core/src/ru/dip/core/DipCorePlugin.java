@@ -59,7 +59,7 @@ public class DipCorePlugin extends AbstractUIPlugin {
 	public static final String GIT_UPDATE = "_git_update";
 	public static final String GIT_SUBMODULE_RECURSE = "_git_submodule_recurse";
 	public static final String DISABLE_RESERVATION = "_disable_reservation";
-	public static final String DISABLE_PREPROCESSING = "_disable_preprocessing";
+	public static final String DISABLE_PREPROCESSING = "_disable_preprocessing_2";
 	
 	// путь до DIA (в Windows)
 	public static final String DIA_PATH = "_dia_path";
@@ -192,7 +192,7 @@ public class DipCorePlugin extends AbstractUIPlugin {
 		}
 		store.setDefault(MONO_FONT, DEFAULT_MONO_FONT);		
 		store.setDefault(DISABLE_RESERVATION, true);
-		store.setDefault(DISABLE_PREPROCESSING, false);
+		store.setDefault(DISABLE_PREPROCESSING, true);
 		store.setDefault(CHANGE_DIP_BANNER2, false);
 		store.setDefault(CHANGE_DIP_BANNER3, false);
 	}

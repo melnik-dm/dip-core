@@ -155,7 +155,6 @@ public class OpenAction extends SelectionDispatchAction {
 				IWorkbenchPage page = getSite().getPage();
 				IEditorInput editorInput = new TableEditorInput(table);
 				try {
-					
 					IEditorPart part = page.openEditor(editorInput, DipTableEditor.EDITOR_ID);
 					part.setFocus();
 				} catch (PartInitException e) {

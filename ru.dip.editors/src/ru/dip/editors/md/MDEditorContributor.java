@@ -22,6 +22,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.BasicTextEditorActionContributor;
 
+import ru.dip.core.utilities.EditorUtils;
 import ru.dip.core.utilities.WorkbenchUtitlities;
 import ru.dip.editors.Messages;
 import ru.dip.editors.dipview.DipView;
@@ -156,7 +157,7 @@ public class MDEditorContributor extends BasicTextEditorActionContributor {
 			WorkbenchUtitlities.openView(DipView.ID);
 			IEditorPart editorPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
 			if (editorPart instanceof MDEditor){
-				((MDEditor) editorPart).firePropertyChange(MDEditor.VISIBLE_EVENT);
+				((MDEditor) editorPart).firePropertyChange(EditorUtils.VISIBLE_EVENT);
 			}
 		}
 	}

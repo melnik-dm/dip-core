@@ -19,4 +19,6 @@ public interface IDipEditor extends IDipProjectHolder {
 
 	void setModelChanged();
 	
+	IDipParent model();
+	
 }

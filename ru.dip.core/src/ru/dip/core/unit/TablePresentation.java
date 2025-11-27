@@ -77,5 +77,11 @@ public abstract class TablePresentation implements IFindable, IGlossarySupport,I
 	public void setTimeModified(long newValue){
 		fTimeModified = newValue;
 	}
+
+	protected void dispose() {
+		if (getImage() != null) {
+			getImage().dispose();
+		}
+	}
 	
 }

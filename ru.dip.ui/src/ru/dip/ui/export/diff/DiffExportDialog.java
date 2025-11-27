@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.Shell;
 import ru.dip.core.model.DipProject;
 import ru.dip.core.utilities.ui.CompositeBuilder;
 import ru.dip.ui.export.ExportDialog;
-import ru.dip.ui.export.ExportVersion;
 import ru.dip.ui.utilities.ui.EntryTextComposite;
 
 public class DiffExportDialog extends ExportDialog {
@@ -43,13 +42,11 @@ public class DiffExportDialog extends ExportDialog {
 	
 	@Override
 	protected void createExtensionComposite(Composite parent) {
-		createDiffComposite(parent);		
-		getVersionCombo().setEnabled(false);
-		getVersionCombo().select(ExportVersion.JAVA_VER_INDEX);	
+		createDiffComposite(parent);
 	}
 		
 	private void createDiffComposite(Composite parent) {
-		Composite composite = CompositeBuilder.instance(parent).horizontal().horizontalSpan(2).build();
+		Composite composite = CompositeBuilder.instance(parent).horizontal().build();
 		fHashEntry1 = new EntryTextComposite(composite, "Commit 1: ");
 		fHashEntry1.setValue(fHash1);
 		fHashEntry1.setEnabled(false);

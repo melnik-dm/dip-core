@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Merge
 Bundle-SymbolicName: ru.dip.merge;singleton:=true
-Bundle-Version: 1.0.0
+Bundle-Version: 1.0.1
 Bundle-License: https://www.eclipse.org/legal/epl-2.0/
 Automatic-Module-Name: ru.dip.merge
 Bundle-RequiredExecutionEnvironment: JavaSE-11

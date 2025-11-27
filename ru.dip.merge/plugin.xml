@@ -13,6 +13,16 @@
             contentMergeViewerId="ru.dip.editors.merge.wrap_text"
             contentTypeId="ru.dip.editors.content-type.md">
       </contentTypeBinding>
+      <viewer
+            class="ru.dip.merge.wraptext.WrapTextViewerCreator"
+            extensions="req"
+            id="ru.dip.editors.merge.form2"
+            label="Form (Text View)">
+      </viewer>
+      <contentTypeBinding
+            contentMergeViewerId="ru.dip.editors.merge.form2"
+            contentTypeId="ru.dip.editors.contenttype.form">
+      </contentTypeBinding>
    </extension>
 
 </plugin>

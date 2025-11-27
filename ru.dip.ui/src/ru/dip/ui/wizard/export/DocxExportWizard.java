@@ -22,7 +22,6 @@ import org.eclipse.ui.IWorkbench;
 import ru.dip.core.model.DipProject;
 import ru.dip.core.utilities.WorkbenchUtitlities;
 import ru.dip.ui.Messages;
-import ru.dip.ui.export.ExportVersion;
 import ru.dip.ui.export.Exporter;
 
 public class DocxExportWizard extends Wizard implements IExportWizard {
@@ -56,7 +55,7 @@ public class DocxExportWizard extends Wizard implements IExportWizard {
 		}
 		Exporter exporter = new Exporter(fPage.project(), getShell());
 		// выбор версии Java
-		exporter.doExport(targetPath, configName(), ExportVersion.JAVA);		
+		exporter.doExport(targetPath, configName());		
 		return true;
 	}
 	

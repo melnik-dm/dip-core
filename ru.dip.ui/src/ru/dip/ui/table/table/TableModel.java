@@ -46,7 +46,7 @@ import ru.dip.core.model.interfaces.IDipDocumentElement;
 public class TableModel implements IDipParent, ITableInputModel {
 	
 	private DipTableContainer fDipContainer;
-	private ArrayList<IDipParent> fParents;
+	private List<IDipParent> fParents;
 	
 	public TableModel(DipTableContainer dipTableContainer) {
 		fDipContainer = dipTableContainer;
@@ -82,7 +82,7 @@ public class TableModel implements IDipParent, ITableInputModel {
 		}
 	}
 	
-	public ArrayList<IDipParent> getParentsList(){
+	public List<IDipParent> getParentsList(){
 		return fParents;
 	}
 	
@@ -473,6 +473,12 @@ public class TableModel implements IDipParent, ITableInputModel {
 	@Override
 	public IReportContainer getReportContainer() {
 		return fDipContainer.getReportContainer();
+	}
+
+	@Override
+	public void dispose() {
+		fDipContainer = null;
+		fParents.clear();
 	}
 
 }

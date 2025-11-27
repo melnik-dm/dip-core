@@ -10,7 +10,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- *******************************************************************************/package ru.dip.core.model.interfaces;
+ *******************************************************************************/
+package ru.dip.core.model.interfaces;
 
 import ru.dip.core.model.finder.FindSettings;
 

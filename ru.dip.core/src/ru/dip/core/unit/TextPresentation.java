@@ -17,8 +17,10 @@ import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
@@ -99,6 +101,13 @@ public class TextPresentation extends TablePresentation implements IVariablesSup
 			}
 			e.printStackTrace();
 		}
+	}
+	
+	/**
+	 * Точки для подстветки синтаксиса в Document (в редакторах-наследниках)
+	 */
+	public Map<List<Point>, Color> getSpecialPoints(){
+		return null;
 	}
 	
 	//========================

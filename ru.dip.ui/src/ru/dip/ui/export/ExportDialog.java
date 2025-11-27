@@ -32,9 +32,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import ru.dip.core.model.DipProject;
 import ru.dip.core.utilities.ArrayUtils;
-import ru.dip.core.utilities.ResourcesUtilities;
 import ru.dip.core.utilities.ui.CompositeBuilder;
-import ru.dip.core.utilities.ui.ControlFactory;
 import ru.dip.core.utilities.ui.swt.ColorProvider;
 import ru.dip.core.utilities.ui.swt.FontManager;
 import ru.dip.ui.Messages;
@@ -47,13 +45,10 @@ public class ExportDialog extends Dialog {
 	// result
 	private String fTagetPath;
 	private String fConfigName;
-	private ExportVersion fExportVersion;
 	
 	// controls
 	private BrowseFolderComposite fOutDirBrowse;
 	private Combo fConfigCombo;
-	private Combo fVersionCombo;
-	
 		
 	public ExportDialog(Shell shell, DipProject project) {
 		super(shell);
@@ -82,12 +77,11 @@ public class ExportDialog extends Dialog {
 	@Override
 	protected Control createDialogArea(Composite parent) {
 		Composite composite = new Composite(parent, SWT.NONE);
-		GridLayout layout = new GridLayout(2, true);
+		GridLayout layout = new GridLayout();
 		layout.marginTop = 5;
 		composite.setLayout(layout);
 		composite.setLayoutData(new GridData(GridData.FILL_BOTH));		
 		createConfigComposite(composite);
-		createExportVersionComposite(composite);
 		createOutComposite(composite);
 		createExtensionComposite(composite);
 		setValues();
@@ -107,31 +101,8 @@ public class ExportDialog extends Dialog {
 		fConfigCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 	}
 	
-	private void createExportVersionComposite(Composite parent) {
-		Composite composite = CompositeBuilder.instance(parent).full().build();
-		ControlFactory.label(composite, "Export version: ", FontManager.boldFont); 
-		fVersionCombo = new Combo(composite, SWT.READ_ONLY);
-		if (ResourcesUtilities.isWindows) {
-			fVersionCombo.setItems(ExportVersion.JAVA_VERSION);
-			fVersionCombo.select(0);
-			fVersionCombo.setEnabled(false);
-		} else {
-			if (ResourcesUtilities.isWindows) {
-				fVersionCombo.setItems(ExportVersion.JAVA_VERSION);
-			} else {
-				fVersionCombo.setItems(
-					ExportVersion.JAVA_VERSION
-					//, ExportVersion.PYTHON_VERSION
-					//, "Both (Java + Python)"
-					);
-			}
-			fVersionCombo.select(0);
-		}		
-		fVersionCombo.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-	}
-	
 	private void createOutComposite(Composite parent){
-		Composite composite = CompositeBuilder.instance(parent).horizontal().horizontalSpan(2).build();	
+		Composite composite = CompositeBuilder.instance(parent).horizontal().build();	
 		Label outLabel = new Label(composite, SWT.NONE);
 		outLabel.setText(Messages.ExportDialog_TargetFolder);
 		outLabel.setFont(FontManager.boldFont);
@@ -163,7 +134,6 @@ public class ExportDialog extends Dialog {
 	
 	private void addValidateListeners() {
 		fConfigCombo.addModifyListener(e -> validate());
-		fVersionCombo.addModifyListener(e -> validate());
 		fOutDirBrowse.getTextControl().addModifyListener(new ModifyListener() {
 			
 			@Override
@@ -191,7 +161,6 @@ public class ExportDialog extends Dialog {
 	
 	private boolean isValid() {
 		return !fConfigCombo.getText().isEmpty()
-				&& !fVersionCombo.getText().isEmpty()
 				&& isValidOutDir();				
 	}
 	
@@ -213,7 +182,6 @@ public class ExportDialog extends Dialog {
 	protected void doOkPressed() {
 		fTagetPath = fOutDirBrowse.getValue();
 		fConfigName = fConfigCombo.getText();
-		fExportVersion = ExportVersion.values()[fVersionCombo.getSelectionIndex()];
 	}
 	
 	public String getTargetPath() {
@@ -222,13 +190,5 @@ public class ExportDialog extends Dialog {
 	
 	public String getConfigName() {
 		return fConfigName;
-	}
-	
-	public ExportVersion getExportVersion() {
-		return fExportVersion;
-	}
-	
-	protected Combo getVersionCombo() {
-		return fVersionCombo;
 	}
 }

@@ -14,16 +14,10 @@
 package ru.dip.core.csv.model;
 
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-//import com.csvreader.CsvReader;
-
-import ru.dip.core.utilities.FileUtilities;
 
 public class CsvModel {
 
@@ -36,74 +30,24 @@ public class CsvModel {
 	}
 
 	public void readModel(Path path) throws IOException {
-		//String content = FileUtilities.readFile(path);
 		List<String> lines = Files.readAllLines(path);
+		readModel(lines);
+	}
+	
+	public void readModel(String content) {
+		readModel(List.of(content.split("\n")));
+	}
+	
+	private void readModel(List<String> lines) {
 		fRows.clear();
 		for (String line: lines) {
 			String[] rowValues = line.split(",");
 			CSVRow csvRow = new CSVRow(rowValues);
-
 			fRows.add(csvRow);
-
 			if (rowValues.length > fNumberOfColumns) {
 				fNumberOfColumns = rowValues.length;
 			}
 		}
-		//readLines(content);
-	}
-
-	/*public void readModel(String content) {
-		readLines(content);
-	}*/
-
-	/*private void readLines(String fileText) {
-		fRows.clear();
-		
-		
-		try {
-			CsvReader csvReader = initializeReader(new StringReader(fileText));
-			while (csvReader.readRecord()) {
-				String[] rowValues = csvReader.getValues();
-				CSVRow csvRow = new CSVRow(rowValues);
-
-				fRows.add(csvRow);
-
-				if (rowValues.length > fNumberOfColumns) {
-					fNumberOfColumns = rowValues.length;
-				}
-			}
-			csvReader.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}*/
-
-	/*private CsvReader initializeReader(Reader reader) {
-		CsvReader csvReader = new CsvReader(reader);
-		char customDelimiter = getCustomDelimiter();
-		csvReader.setDelimiter(customDelimiter);
-		char commentChar = getCommentChar();
-		if (commentChar != Character.UNASSIGNED) {
-			csvReader.setComment(commentChar);
-			// prevent loss of comment in csv source file
-			csvReader.setUseComments(false);
-		}
-
-		csvReader.setTextQualifier(getTextQualifier());
-		csvReader.setUseTextQualifier(true);
-		return csvReader;
-	}*/
-
-	private char getCustomDelimiter() {
-		return ',';
-	}
-
-	private char getCommentChar() {
-		return Character.UNASSIGNED;
-	}
-
-	private char getTextQualifier() {
-		return '"';
 	}
 
 	// ===============================

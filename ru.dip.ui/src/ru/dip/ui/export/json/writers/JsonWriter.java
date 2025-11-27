@@ -30,17 +30,19 @@ import ru.dip.core.link.IncorrectLink;
 import ru.dip.core.link.Link;
 import ru.dip.core.link.LinkInteractor;
 import ru.dip.core.model.interfaces.IDipElement;
-import ru.dip.core.utilities.FileUtilities;
 import ru.dip.core.utilities.DipUtilities;
+import ru.dip.core.utilities.FileUtilities;
 import ru.dip.ui.export.ExportElement;
 import ru.dip.ui.export.ExportElementType;
-import ru.dip.ui.export.ExportPreprocessor;
+import ru.dip.ui.export.FullExportElement;
+import ru.dip.ui.export.FullExportPreprocessor;
+import ru.dip.ui.export.IExportElement;
 
 public class JsonWriter {
 	
-	private ExportPreprocessor fPreprocessor;
+	private FullExportPreprocessor fPreprocessor;
 	
-	public JsonWriter(ExportPreprocessor preprocessor) {
+	public JsonWriter(FullExportPreprocessor preprocessor) {
 		fPreprocessor = preprocessor;
 	}
 	
@@ -48,7 +50,7 @@ public class JsonWriter {
 		//Gson gson = new Gson();
 		GsonBuilder builder = new GsonBuilder();
 		builder.registerTypeAdapter(ExportElement.class, new ExportElementSerializer());
-		builder.registerTypeAdapter(ExportPreprocessor.class, new ExportSerializer());
+		builder.registerTypeAdapter(FullExportPreprocessor.class, new ExportSerializer());
 		builder.registerTypeAdapter(Link.class, new LinkSerializer());
 		builder.registerTypeAdapter(IncorrectLink.class, new LinkSerializer());
 		builder.registerTypeAdapter(CorrectLink.class, new LinkSerializer());
@@ -58,23 +60,23 @@ public class JsonWriter {
 		FileUtilities.writeFile(fPreprocessor.getPartPath().resolve("model.json"), json);
 	}
 	
-	private class ExportSerializer implements JsonSerializer<ExportPreprocessor> {
+	private class ExportSerializer implements JsonSerializer<FullExportPreprocessor> {
 		
 		@Override
-		public JsonElement serialize(ExportPreprocessor preprocessor, Type arg1, JsonSerializationContext arg2) {
+		public JsonElement serialize(FullExportPreprocessor preprocessor, Type arg1, JsonSerializationContext arg2) {
 			JsonArray array = new JsonArray();			
-			for (ExportElement element: preprocessor.getElements()) {
-				JsonElement el = arg2.serialize(element);				
+			for (IExportElement element: preprocessor.getElements()) {
+				JsonElement el = arg2.serialize((FullExportElement)element);				
 				array.add(el);			
 			}			
 			return array;
 		}
 	}
 	
-	private class ExportElementSerializer implements JsonSerializer<ExportElement> {
+	private class ExportElementSerializer implements JsonSerializer<FullExportElement> {
 
 		@Override
-		public JsonElement serialize(ExportElement element, Type arg1, JsonSerializationContext context) {		
+		public JsonElement serialize(FullExportElement element, Type arg1, JsonSerializationContext context) {		
 			JsonObject jsElement = new JsonObject();
 			ExportElementType type = element.getType();			
 			setType(jsElement, type);
@@ -96,25 +98,25 @@ public class JsonWriter {
 			jsElement.addProperty("type", type.toString());
 		}
 		
-		private void setId(JsonObject jsElement, ExportElement element) {
+		private void setId(JsonObject jsElement, FullExportElement element) {
 			jsElement.addProperty("id", element.getId());			
 		}
 		
-		private void setDescription(JsonObject jsElement, ExportElement element) {
+		private void setDescription(JsonObject jsElement, FullExportElement element) {
 			String description = element.getDescription();
 			if (description != null) {
 				jsElement.addProperty("description", description);
 			}
 		}
 		
-		private void setPath(JsonObject jsElement, ExportElement element) {
+		private void setPath(JsonObject jsElement, FullExportElement element) {
 			String path = element.getPath();
 			if (path != null) {
 				jsElement.addProperty("path", path);
 			}
 		}
 		
-		private void setLinks(JsonObject jsElement, ExportElement element, JsonSerializationContext context) {
+		private void setLinks(JsonObject jsElement, FullExportElement element, JsonSerializationContext context) {
 			List<Link> links = element.getLinks();
 			if (links != null && !links.isEmpty()) {				
 				JsonArray array = new JsonArray();			
@@ -126,19 +128,19 @@ public class JsonWriter {
 			}
 		}
 
-		private void setNumeration(JsonObject jsElement, ExportElement element) {
+		private void setNumeration(JsonObject jsElement, FullExportElement element) {
 			if (element.getNumber() != null) {
 				jsElement.addProperty("number", element.getNumber());
 			}	
 		}
 		
-		private void setLandscape(JsonObject jsElement, ExportElement element) {			
+		private void setLandscape(JsonObject jsElement, FullExportElement element) {			
 			if (element.isLandscape()) {
 				jsElement.addProperty("landscape", true);
 			}			
 		}
 		
-		private void setPageBreak(JsonObject jsElement, ExportElement element) {
+		private void setPageBreak(JsonObject jsElement, FullExportElement element) {
 			if (element.getType() != null 
 					&& element.getType().isFolder()
 					&& element.getPageBreak() != null) {
@@ -146,7 +148,7 @@ public class JsonWriter {
 			}
 		}
 		
-		private void setAppendix(JsonObject jsElement, ExportElement element) {			
+		private void setAppendix(JsonObject jsElement, FullExportElement element) {			
 			if (element.isAppendix()) {
 				jsElement.addProperty("appendix", true);
 			}			

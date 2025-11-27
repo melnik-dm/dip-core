@@ -37,6 +37,7 @@ import ru.dip.ui.Messages;
 public class DeleteController {
 	
 	public static class DeleteControllerBuilder {
+		
 		private IDipElement[] fElements;
 		private boolean fReserve = false;
 		private boolean fExtractContent = false;

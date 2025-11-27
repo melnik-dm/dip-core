@@ -13,9 +13,7 @@
  *******************************************************************************/
 package ru.dip.ui.export;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -34,6 +32,7 @@ import ru.dip.core.utilities.DipUtilities;
 import ru.dip.ui.Messages;
 import ru.dip.ui.dialog.ExportFinishDialog;
 import ru.dip.ui.export.error.IExportError;
+import ru.dip.ui.table.ExporterHolder;
 
 public class Exporter {
 	
@@ -57,13 +56,13 @@ public class Exporter {
 	public void doExport() {
 		ExportDialog dialog = new ExportDialog(fShell, fDipProject);
 		if (dialog.open() == Dialog.OK) {
-			doExport(dialog.getTargetPath(), dialog.getConfigName(), dialog.getExportVersion());
+			doExport(dialog.getTargetPath(), dialog.getConfigName());
 		}
 	}
 	
-	public void doExport(String targetPath, String config, ExportVersion exportVersion) {	
+	public void doExport(String targetPath, String config) {	
 		udpateExportProperties(targetPath, config);  // добавить обновление верси в Properties
-		runExportCommand(targetPath, config, exportVersion);
+		runExportCommand(targetPath, config);
 	}
 	
 	private void udpateExportProperties(String targetPath, String config) {
@@ -71,9 +70,9 @@ public class Exporter {
 		fDipProject.getProjectProperties().setExportConfig(config);
 	}
 	
-	private void runExportCommand(String targetPath, String config, ExportVersion exportVersion) {	
+	private void runExportCommand(String targetPath, String config) {	
 		ProgressMonitorDialog progressDialog = createProgressMonitorDialog();
-		runExport(progressDialog, targetPath, config, exportVersion);		
+		runExport(progressDialog, targetPath, config);		
 		if (fDoCancel){
 			return;
 		}
@@ -104,50 +103,10 @@ public class Exporter {
 		return dialog;
 	}
 	
-	private void runExport(ProgressMonitorDialog progressDialog, String targetPath, String config, ExportVersion version) {		
-
-		switch (version) {
-		case JAVA:{
-			Path javaPath = Paths.get(targetPath);
-			javaVersion(progressDialog, javaPath, config);
-			break;
-		}
-		case PYTHON:{
-			pythonVersion(progressDialog, targetPath, config);
-			break;
-		}
-		case BOTH:{
-			Path javaPath = Paths.get(targetPath,"java");
-			if (!Files.exists(javaPath)) {
-				try {
-					Files.createDirectories(javaPath);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			
-			javaVersion(progressDialog, javaPath, config);
-			
-			
-			
-			Path pythonPath = Paths.get(targetPath,"python");
-			if (!Files.exists(pythonPath)) {
-				try {
-					Files.createDirectories(pythonPath);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-			
-			pythonVersion(progressDialog, pythonPath.toString(), config);
-			break;
-		}
-		}
+	private void runExport(ProgressMonitorDialog progressDialog, String targetPath, String config) {
+		Path javaPath = Paths.get(targetPath);
+		javaVersion(progressDialog, javaPath, config);
 	}
-	
-	
-
-	
 	
 	private void javaVersion(ProgressMonitorDialog progressDialog, Path targetPath, String config) {
 		try {
@@ -160,10 +119,10 @@ public class Exporter {
 						fDipProject.setUpdateImageListeners(false);
 						fAllUnits = DipUtilities.countUnits(fDipProject);
                         monitor.beginTask("Preprocessing", (int) fAllUnits);		
-                        ExportPreprocessor exportPreprocessor = new ExportPreprocessor(fDipProject, targetPath, Paths.get(config), monitor,  (int) fAllUnits);
+                        IExportPreprocessor exportPreprocessor = getExportPreprocessor(fDipProject, targetPath, Paths.get(config), monitor,  (int) fAllUnits);
                         fOutput = exportPreprocessor.export();
                         fExportErrors = exportPreprocessor.getExportErrors();
-						fExportSuccess = true;						
+						fExportSuccess = true;
 					} catch (Exception e) {						
 						e.printStackTrace();
 						if (e instanceof IExportException) {
@@ -177,6 +136,7 @@ public class Exporter {
                     finally  {
                         monitor.done();
 						fDipProject.setUpdateImageListeners(true);
+						ExporterHolder.instance().getExporter().clear();
                     }
 				}
 			});
@@ -186,24 +146,14 @@ public class Exporter {
 		} 	
 	}
 	
-	private void pythonVersion(ProgressMonitorDialog progressDialog, String targetPath, String config) {
-		try {
-			progressDialog.run(true, true, new IRunnableWithProgress() {
-				public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {										
-					fExportCommand = new ExportExternalCommand(fDipProject, true, targetPath, config);
-					try {
-						fExportSuccess = fExportCommand.runCommand();
-					} catch (ExportCommandException e) {
-						e.printStackTrace();
-						fException = e;
-					}
-				}								
-			});
-		} catch (InvocationTargetException | InterruptedException e) {
-			e.printStackTrace();
-		} 		
+	private IExportPreprocessor getExportPreprocessor(DipProject dipProject, Path targetPath, Path path, IProgressMonitor monitor, int allUnits) {
+       if (DipCorePlugin.isDisablePreprocessing()) {
+    	   return new ExportPreprocessor(fDipProject, targetPath, path, monitor, allUnits);
+       } else {
+    	   return new FullExportPreprocessor(fDipProject, targetPath, path, monitor, allUnits);
+       }
 	}
-	
+		
 	private void openResultDialog(String targetPath) {
 		String resultPath = fOutput != null ? fOutput : getResultPath(targetPath);
 		ExportFinishDialog dialog = new ExportFinishDialog(fShell, resultPath, Messages.ExportDialog_ProjectExported, fExportErrors);

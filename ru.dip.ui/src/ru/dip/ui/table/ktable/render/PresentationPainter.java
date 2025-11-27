@@ -16,7 +16,9 @@ package ru.dip.ui.table.ktable.render;
 import static ru.dip.ui.table.ktable.model.ContentProvider.PRESENTATION_CONTENT_PROVIDER;
 
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -40,7 +42,6 @@ import ru.dip.core.unit.DiaPresentation;
 import ru.dip.core.unit.GlossaryPresentation;
 import ru.dip.core.unit.HtmlUnitPresentation;
 import ru.dip.core.unit.ImagePresentation;
-import ru.dip.core.unit.JsonPresentation;
 import ru.dip.core.unit.PagebreakPresentation;
 import ru.dip.core.unit.PlantUmlPresentation;
 import ru.dip.core.unit.ReportRefPresentation;
@@ -183,9 +184,6 @@ public class PresentationPainter {
 		} else if (presentation instanceof MarkDownPresentation) {
 			updateMarkdownPresentation(width, (MarkDownPresentation) presentation, element);
 			contentProvider.setHeight(element, measureSimpleTextPresentation(element));
-		} else if (presentation instanceof JsonPresentation) { 
-			updateJsonPresentation(width, (JsonPresentation) presentation, element);
-			contentProvider.setHeight(element, measureSimpleTextPresentation(element));
 		} else if (presentation instanceof FormPresentation) {
 			updateRequireemntPresentation(width, (FormPresentation) presentation, element);
 			contentProvider.setHeight(element, measureSimpleTextPresentation(element));
@@ -250,16 +248,6 @@ public class PresentationPainter {
 			mdText = indent + number + mdText.substring(indent.length());
 		}		
 		updateTextPresentation(width, mdText, element, subMdPresentation);
-	}	
-	
-	// такой же метод как и для обычного текста (наверно можно убрать)
-	private void updateJsonPresentation(int columnWidth, JsonPresentation jsonPresentation, IContentContainer element) {		
-		int width = getColumnWidth(columnWidth);
-		if (!jsonPresentation.checkUpdate()) {
-			jsonPresentation.read();
-		}		
-		String text = jsonPresentation.getText();	
-		updateTextPresentation(width, text, element, jsonPresentation);
 	}
 	
 	private void updateTextPresentation(int columnWidth, String text, IContentContainer element, ITextPresentation textPresentation ) {
@@ -520,10 +508,7 @@ public class PresentationPainter {
 	
 	public void paintTablePresentation(int width, GC gc, Rectangle rect, TablePresentation tablePresentation,
 			IContentContainer element) {
-		if (tablePresentation instanceof JsonPresentation) {
-			JsonPresentation jsonPresentation = (JsonPresentation) tablePresentation;
-			paintJsonPresentation(width, gc, rect, jsonPresentation, element);
-		} else if (tablePresentation instanceof TextPresentation) {
+		if (tablePresentation instanceof TextPresentation) {
 			TextPresentation textPresentation = (TextPresentation) tablePresentation;
 			paintTextPresentation(width, gc, rect, textPresentation, element);
 		} else if (tablePresentation instanceof MarkDownPresentation) {
@@ -550,18 +535,14 @@ public class PresentationPainter {
 	    final TextLayout layout = createTextLayout(text, width, gc);
     	applyGlossaryStyles(layout, textPresentation);
     	applyErrorStyles(layout, textPresentation.errorsPoints());
+    	
+    	Map<List<Point>, Color> specialPoints = textPresentation.getSpecialPoints();
+    	if (specialPoints != null) {
+    		specialPoints.entrySet().forEach(e -> GCUtils.applyColorStyles(layout, e.getKey(), null, e.getValue()));
+    	}
+    	
     	applyFindedStyles(layout, textPresentation.getFindedPoints(), textPresentation); 	
 	    drawTextAndDispose(layout, rect, gc);
-	}
-	
-	public void paintJsonPresentation(int width, GC gc, Rectangle rect, 
-			JsonPresentation jsonPresentation, IContentContainer element) {	
-		String text = contentProvider.getText(element); 
-	    final TextLayout layout = createTextLayout(text, width, gc);	    
-    	applyGlossaryStyles(layout, jsonPresentation);
-    	applyErrorStyles(layout, jsonPresentation.errorsPoints());		
-    	applyFindedStyles(layout, jsonPresentation.getFindedPoints(), jsonPresentation); 	
-	    drawTextAndDispose(layout, rect, gc);   
 	}
 	
 	public void paintMarkdownPresentation(int width, GC gc, Rectangle rect, 

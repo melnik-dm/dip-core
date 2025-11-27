@@ -26,14 +26,14 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 import ru.dip.core.utilities.FileUtilities;
-import ru.dip.ui.export.ExportPreprocessor;
+import ru.dip.ui.export.FullExportPreprocessor;
 import ru.dip.ui.export.TocEntry;
 
 public class TocJsonWriter {
 	
-	public void writeToJson(ExportPreprocessor preprocessor, Path targetPath) throws IOException {
+	public void writeToJson(FullExportPreprocessor preprocessor, Path targetPath) throws IOException {
 		GsonBuilder builder = new GsonBuilder();
-		builder.registerTypeAdapter(ExportPreprocessor.class, new TocElementSerializer());
+		builder.registerTypeAdapter(FullExportPreprocessor.class, new TocElementSerializer());
 		builder.registerTypeAdapter(TocEntry.class, new TocEntrySerializer());
 		builder.setPrettyPrinting();	
 		Gson gson = builder.create();
@@ -41,10 +41,10 @@ public class TocJsonWriter {
 		FileUtilities.writeFile(targetPath, json);
 	}
 	
-	private class TocElementSerializer implements JsonSerializer<ExportPreprocessor> {
+	private class TocElementSerializer implements JsonSerializer<FullExportPreprocessor> {
 		
 		@Override
-		public JsonElement serialize(ExportPreprocessor preprocessor, Type arg1, JsonSerializationContext arg2) {
+		public JsonElement serialize(FullExportPreprocessor preprocessor, Type arg1, JsonSerializationContext arg2) {
 			JsonArray array = new JsonArray();			
 			for (TocEntry tocEntry: preprocessor.getTocEntries()) {
 				JsonElement el = arg2.serialize(tocEntry);				

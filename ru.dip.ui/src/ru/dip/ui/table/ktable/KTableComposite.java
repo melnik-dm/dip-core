@@ -130,6 +130,7 @@ import ru.dip.ui.action.hyperlink.ReqLink;
 import ru.dip.ui.controller.RenameController;
 import ru.dip.ui.glossary.GlossaryDialog;
 import ru.dip.ui.table.editor.DipTableEditor;
+import ru.dip.ui.table.ktable.TableSizeInteractor.CompositeControlListener;
 import ru.dip.ui.table.ktable.actions.EditCommentAction;
 import ru.dip.ui.table.ktable.actions.EditDescriptionAction;
 import ru.dip.ui.table.ktable.actions.manager.AutoNumberingInteractor;
@@ -189,6 +190,18 @@ public class KTableComposite extends Composite implements ITableComposite {
 	private PasteInteractor fPasteInteractor;
 	private CopyIdIneractor fCopyIdIneractor;
 	
+	// listeners
+	KTableCellResizeListener fTableCellResizeListener;
+	private ControlListener controlListener;
+	DisposeListener fDisposeListener;
+	private TableMouseWheelListener fTableMouseWheelListener;
+	private FocusLostListener fFocusLostListener;
+	private MouseListener fMouseListener;
+	@SuppressWarnings("unused")
+	private CompositeControlListener fCompositeControlLlistener;
+	private KeyListener fKeyListener;
+
+	
 	// settings
 	private boolean fOneListMode = false; // отображение одним списком (без узлов)
 	private boolean fHighlightGlossMode = false;
@@ -247,8 +260,6 @@ public class KTableComposite extends Composite implements ITableComposite {
 	 * Основна работа, нужно вызывать после создания конструктора
 	 */
 	public void initialize() {
-		System.out.println("INITIALIZE");
-		
 		initLayout();
 		setViewModeProperties();
 		fTable = new DipTable(this,
@@ -258,7 +269,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 		
 		createTable();
 		applyTableProperties();
-		fTable.addCellResizeListener(new KTableCellResizeListener() {
+		fTable.addCellResizeListener(fTableCellResizeListener = new KTableCellResizeListener() {
 
 			@Override
 			public void rowResized(int row, int newHeight) {}
@@ -273,8 +284,10 @@ public class KTableComposite extends Composite implements ITableComposite {
 		fSizeInteractor = new TableSizeInteractor(this);
 		fSizeInteractor.readSavedMaxMinSizes();
 		fSizeInteractor.readSavedColumnsWidth();
-		addControlListener(fSizeInteractor.getCompositeControlListener());
+		
+		addControlListener(fCompositeControlLlistener = fSizeInteractor.getCompositeControlListener());
 	}
+
 	
 	private void initLayout() {
 		setLayout(new FillLayout());
@@ -381,9 +394,9 @@ public class KTableComposite extends Composite implements ITableComposite {
 
 	// =============================
 	// control listener (обновление ширины столбцов, при изменении общих размеров)
-
+	
 	private void addCompositeControlListener() {
-		fTable.addControlListener(new ControlListener() {
+		fTable.addControlListener(controlListener = new ControlListener() {
 
 			@Override
 			public void controlResized(ControlEvent e) {
@@ -400,11 +413,27 @@ public class KTableComposite extends Composite implements ITableComposite {
 	// ======================================
 	// Key listener (ctrlmode/ctrlshift mode)
 
+	
+	private Display fListenerDisplay;
+	
 	private void addCtrlKeyListener() {
 		fKeyUpListener = new KeyUpListener();
 		fKeyDownListner = new KeyDownListener();
-		Display.getDefault().addFilter(SWT.KeyUp, fKeyUpListener);
-		Display.getDefault().addFilter(SWT.KeyDown, fKeyDownListner);
+		fListenerDisplay = Display.getDefault();
+		fListenerDisplay.addFilter(SWT.KeyUp, fKeyUpListener);
+		fListenerDisplay.addFilter(SWT.KeyDown, fKeyDownListner);
+	}
+	
+	private void removeKeyListener() {
+		if (fKeyUpListener != null) {
+			fListenerDisplay.removeFilter(SWT.KeyUp, fKeyUpListener);
+			fKeyUpListener = null;
+		}
+		if (fKeyDownListner != null) {
+			fListenerDisplay.removeFilter(SWT.KeyDown, fKeyDownListner);
+			fKeyDownListner = null;
+		}
+		fListenerDisplay = null;
 	}
 
 	private class KeyUpListener implements Listener {
@@ -520,13 +549,13 @@ public class KTableComposite extends Composite implements ITableComposite {
 	// ====================================
 	// scroll listener
 
+
+	
 	private void addScrolListener() {
-		fTable.addMouseWheelListener(new TableMouseWheelListener());
-		fKeyUpListener = new KeyUpListener();
-		fKeyDownListner = new KeyDownListener();
-		Display.getDefault().addFilter(SWT.KeyUp, fKeyUpListener);
-		Display.getDefault().addFilter(SWT.KeyDown, fKeyDownListner);
-		fTable.addFocusListener(new FocusLostListener());
+		fTable.addMouseWheelListener(fTableMouseWheelListener = new TableMouseWheelListener());
+		//Display.getDefault().addFilter(SWT.KeyUp, fKeyUpListener);
+		//Display.getDefault().addFilter(SWT.KeyDown, fKeyDownListner);
+		fTable.addFocusListener(fFocusLostListener = new FocusLostListener());
 	}
 
 	private class TableMouseWheelListener implements MouseWheelListener {
@@ -626,9 +655,11 @@ public class KTableComposite extends Composite implements ITableComposite {
 	// =============================
 	// mouse listener (selection/folding)
 	
+	
+	
 	private void addMouseListener() {
 
-		fTable.addMouseListener(new MouseListener() {
+		fTable.addMouseListener(fMouseListener = new MouseListener() {
 
 			@Override
 			public void mouseUp(MouseEvent e) {}
@@ -791,8 +822,10 @@ public class KTableComposite extends Composite implements ITableComposite {
 	// ================================
 	// key listener (up, down, rename, delete, ctrl + c, ctrl-shift + c)
 	
+	
+	
 	private void addKeyListener() {
-		fTable.addKeyListener(new KeyListener() {
+		fTable.addKeyListener(fKeyListener = new KeyListener() {
 
 			@Override
 			public void keyPressed(KeyEvent e) {
@@ -837,8 +870,10 @@ public class KTableComposite extends Composite implements ITableComposite {
 	// ===============================
 	// dispose listener
 
+
+	
 	private void addDisposeListener() {
-		fTable.addDisposeListener(new DisposeListener() {
+		fTable.addDisposeListener(fDisposeListener = new DisposeListener() {
 
 			@Override
 			public void widgetDisposed(DisposeEvent e) {
@@ -1965,6 +2000,60 @@ public class KTableComposite extends Composite implements ITableComposite {
 	public void dispose() {
 		disposeListeners();
 		fPasteInteractor.dispose();
+		removeKeyListener();
+		
+		//removeControlListener(compositeControlLlistener);
+		fCompositeControlLlistener = null;
+		
+		fActionStack = null;		
+		fEditor = null;
+		
+		fDipTableModel.dispose();		
+		fDipTableModel = null;
+		
+		if (!fTable.isDisposed()) {
+			fTable.removeControlListener(controlListener);
+			fTable.removeCellResizeListener(fTableCellResizeListener);
+			fTable.removeDisposeListener(fDisposeListener);
+			fTable.removeMouseWheelListener(fTableMouseWheelListener);
+			fTable.removeFocusListener(fFocusLostListener);
+			fTable.removeMouseListener(fMouseListener);
+			fTable.removeKeyListener(fKeyListener);
+		}
+
+		controlListener = null;
+		fTableCellResizeListener = null;
+		fTableCellResizeListener = null;
+		fDisposeListener = null;
+		fTableMouseWheelListener = null;
+		fFocusLostListener = null;		
+		fMouseListener = null;
+		fKeyListener = null;
+		
+		fTable.dispose();
+		fTable = null;
+		fModel = null;
+		fCellEditorsManager = null;
+		fSelector = null;
+		fColorInteractor = null;
+		fSizeInteractor = null;
+		fTableActionInteractor = null;
+		fDiffInteractor = null;
+		fDropAction = null;
+ 		fMdActionItenractor = null;
+		fActionStack = null;
+		fImportActionInteractor = null;
+		fCreateFileInteractor = null;
+		fIncludeInteractor = null;		
+		fDeleteInteractor = null;
+		fEditDescriptionInteractor = null;
+		fEditCommentInteractor = null;
+		fAutoNumberingInteractor = null;
+		fIntoFolderInteractor = null;
+		fPasteInteractor = null;
+		fCopyIdIneractor = null;
+		fFormSettings = null;
+		findables = null;
 		super.dispose();
 	}
 

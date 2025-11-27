@@ -54,5 +54,4 @@ public class DnfoTable extends DipElement {
 	public <T> T getAdapter(Class<T> adapter) {
 		return null;
 	}
-
 }

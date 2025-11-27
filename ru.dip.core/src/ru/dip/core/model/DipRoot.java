@@ -210,11 +210,19 @@ public class DipRoot {
 	
 	public void putElement(IDipElement element) {
 		String id = mapID(element);
+		IDipElement oldElement = fElements.get(id);
+		if (oldElement != null) {
+			oldElement.dispose();
+		}	
 		fElements.put(id, element);
 	}
 	
 	public void removeElement(IDipElement element) {
 		String id = mapID(element);
+		IDipElement oldElement = fElements.get(id);
+		if (oldElement != null) {
+			oldElement.dispose();
+		}
 		fElements.remove(id);
 		
 		// надо подумать, как это будет работать с инклюдами
@@ -249,6 +257,7 @@ public class DipRoot {
 	
 	public void clear() {
 		fProjects.clear();
+		fElements.values().forEach(IDipElement::dispose);
 		fElements.clear();
 	}
 	

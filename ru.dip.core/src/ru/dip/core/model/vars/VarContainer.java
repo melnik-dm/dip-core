@@ -294,5 +294,8 @@ public class VarContainer implements IVarContainer, IParent {
 
 	@Override
 	public void setResource(IResource resource) {}
+
+	@Override
+	public void dispose() {}
 	
 }

@@ -32,7 +32,7 @@ import ru.dip.core.model.interfaces.IDipUnit;
 import ru.dip.core.unit.CsvUnitPresentation;
 import ru.dip.core.unit.HtmlImagePresentation;
 import ru.dip.core.unit.TablePresentation;
-import ru.dip.core.utilities.ui.swt.ImageUtilities;
+import ru.dip.core.utilities.ui.image.ImageUtilities;
 import ru.dip.ui.imageview.interfaces.IImageView;
 import ru.dip.ui.imageview.interfaces.IImageViewPreferences;
 import ru.dip.ui.table.table.TableSettings;

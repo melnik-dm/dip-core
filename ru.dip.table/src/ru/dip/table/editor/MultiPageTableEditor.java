@@ -24,18 +24,22 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.part.FileEditorInput;
 
+import ru.dip.core.external.editors.IDipHtmlRenderExtension;
+import ru.dip.core.model.DipProject;
+import ru.dip.core.unit.TextPresentation;
+import ru.dip.core.utilities.DipUtilities;
+import ru.dip.core.utilities.EditorUtils;
+import ru.dip.core.utilities.FileUtilities;
+import ru.dip.core.utilities.TagStringUtilities;
+import ru.dip.core.utilities.xml.XmlStringUtilities;
 import ru.dip.table.Messages;
 import ru.dip.table.editor.table.TablePage;
 import ru.dip.table.editor.text.TableTextEditor;
 
-public class MultiPageTableEditor extends FormEditor {
+public class MultiPageTableEditor extends FormEditor implements IDipHtmlRenderExtension {
 
 	public static final String ID = Messages.MultiPageTableEditor_ID;
-	
-	public static final int SAVE_EVENT = 88;
-	public static final int VISIBLE_EVENT = 89;
-	public static final int HIDE_EVENT = 90;
-	
+		
 	private TableTextEditor fTextEditor;
 	private TablePage fTablePage;
 	private IFile fFile;
@@ -107,17 +111,6 @@ public class MultiPageTableEditor extends FormEditor {
 			}					
 		});
 	}
-		
-	//==================
-	// events
-	
-	public void visible() {
-		firePropertyChange(VISIBLE_EVENT);
-	}
-	
-	public void hide() {
-		firePropertyChange(HIDE_EVENT);
-	}
 	
 	//=======================
 	// save
@@ -142,7 +135,7 @@ public class MultiPageTableEditor extends FormEditor {
 
 	public void fireDirtyPropertyChange() {
 		firePropertyChange(PROP_DIRTY);
-		firePropertyChange(SAVE_EVENT);
+		firePropertyChange(EditorUtils.SAVE_EVENT);
 	}
 	
 	@Override
@@ -172,6 +165,41 @@ public class MultiPageTableEditor extends FormEditor {
 		firePropertyChange(PROP_DIRTY);
 	}
 	
+	//=======================
+	// for dip render
+	
+	@Override
+	public String getHtmlPresentation() {
+		String html = FileUtilities.readFile(fFile, ""); //$NON-NLS-1$
+		html = addBorderAttr(html);
+		html = changeLinks(html, fFile);	
+		return html;
+	}
+	
+	private String addBorderAttr(String original) {
+		String[] lines = original.split("\n");			 //$NON-NLS-1$
+		if (lines.length > 0) {
+			String tag = lines[0];
+			String newTag = XmlStringUtilities. changeValueAttribut("border", "1", tag); //$NON-NLS-1$ //$NON-NLS-2$
+			lines[0] = newTag;
+			StringBuilder builder = new StringBuilder();
+			for (String str : lines) {
+				builder.append(str);
+				builder.append(TagStringUtilities.lineSeparator());
+			}
+			return builder.toString();
+		}
+		return original;
+	}
+	
+	private String changeLinks(String original, IFile file) {
+		DipProject dipProject = DipUtilities.findDipProject(file);
+		if (original != null && !original.isEmpty() && dipProject != null) {
+			return TextPresentation.prepareTextWithoutUnit(original, dipProject);
+		}
+		return original;
+	}
+	
 	//=========================
 	// getters
 	
@@ -185,5 +213,10 @@ public class MultiPageTableEditor extends FormEditor {
 	
 	public TableTextEditor textEditor() {
 		return fTextEditor;
+	}
+
+	@Override
+	public IFile getFile() {
+		return fFile;
 	}
 }

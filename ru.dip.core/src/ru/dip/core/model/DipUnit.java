@@ -240,4 +240,14 @@ public class DipUnit extends DipElement implements IDipUnit {
 		fMarks[number] = value;
 	}
 
+	@Override
+	public void dispose() {
+		if (fDipUnitDescription != null) {
+			fDipUnitDescription.dispose();
+		}
+		if (fUnitPresentation != null) {
+			fUnitPresentation.dispose();
+		}
+	}
+
 }

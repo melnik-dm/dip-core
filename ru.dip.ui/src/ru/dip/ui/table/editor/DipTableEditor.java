@@ -66,6 +66,7 @@ import ru.dip.core.model.interfaces.IDipEditor;
 import ru.dip.core.model.interfaces.IDipElement;
 import ru.dip.core.model.interfaces.IFindSupport;
 import ru.dip.core.table.TableWriter;
+import ru.dip.core.unit.UnitPresentationCache;
 import ru.dip.core.utilities.DipUtilities;
 import ru.dip.core.utilities.FileUtilities;
 import ru.dip.core.utilities.ResourcesUtilities;
@@ -100,9 +101,11 @@ public class DipTableEditor extends EditorPart implements IResourceChangeListene
 	private int fOldPartSizeState = -1;
 	private int fCurrentPartSizeState = -1;
 	private boolean fStart = false;
-	// listener
-	private IMarksUpdateListener fMarksUpdateListener;	
+	// listeners
+	private IMarksUpdateListener fMarksUpdateListener;
+	private EditorControlListener fParentControlListener;
 	// control
+	private Composite fParentComposite;
 	private Composite fMainComposite;
 	private Label fProjectLabel;
 	private Label fFileLabel;
@@ -217,7 +220,8 @@ public class DipTableEditor extends EditorPart implements IResourceChangeListene
 	
 	@Override
 	public void createPartControl(Composite parent) {
-		parent.addControlListener(new EditorControlListener());
+		fParentComposite = parent;
+		parent.addControlListener(fParentControlListener = new EditorControlListener());
 		fMainComposite = new Composite(parent, SWT.BORDER);
 		fMainComposite.setLayout(new GridLayout());
 		fMainComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -270,10 +274,7 @@ public class DipTableEditor extends EditorPart implements IResourceChangeListene
 		return fCurrentPartSizeState == 2 && fOldPartSizeState == 1;
 	}
 
-
-	
-	private void createFileLabelComposite(Composite parent){
-		
+	private void createFileLabelComposite(Composite parent){		
 		Composite topComposite = new Composite(parent, SWT.NONE);
 		topComposite.setLayout(new FormLayout());
 		topComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -611,8 +612,38 @@ public class DipTableEditor extends EditorPart implements IResourceChangeListene
 	@Override
 	public void dispose() {
 		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+		fMarksUpdateListener = null;
+		
+		if (fParentComposite != null && !fParentComposite.isDisposed()) {
+			fParentComposite.removeControlListener(fParentControlListener);
+		}
+		
+		if (fMainComposite != null && !fMainComposite.isDisposed()) {
+			fMainComposite.removeMouseListener(fDeselectMouseListener);
+		}
+		fDeselectMouseListener = null;
+		
+		fButtonManger.removeMouseListener();
+
 		DipEditorRegister.instance.unregisterEditor(this);
+		fParentControlListener = null;
+		fUpdater = null;
+		
+		fTableModel.dispose();
+		fTableModel = null;
+		
+		fContainer = null;
+		fMarksUpdateListener = null;
+		fParentControlListener = null;
+		
+		fButtonManger.dispose();
+		fButtonManger = null;
+		
+		fKTableComposite.dispose();
+		fKTableComposite = null;
+		
 		super.dispose();
+		UnitPresentationCache.clearHash();
 	}
 	
 	//==========================
@@ -630,6 +661,7 @@ public class DipTableEditor extends EditorPart implements IResourceChangeListene
 		return fTableModel.dipProject();
 	}
 	
+	@Override
 	public TableModel model(){
 		return fTableModel;
 	}

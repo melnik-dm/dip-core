@@ -10,7 +10,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  *
- *******************************************************************************/package ru.dip.ui.variable.view;
+ *******************************************************************************/
+package ru.dip.ui.variable.view;
 
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;

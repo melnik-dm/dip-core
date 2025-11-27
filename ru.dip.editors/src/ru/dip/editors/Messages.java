@@ -58,8 +58,8 @@ public class Messages extends NLS {
 	public static String DipView_ViewSizeActionName;
 	public static String DipView_ZoomMinusActionName;
 	public static String DipView_ZoomPlusActionName;
-	//public static String DotEditor_ID;
-	//public static String EditorContributor_OpenDipViewActionName;
+	public static String DotEditor_ID;
+	public static String DotEditorContributor_OpenDipViewActionName;
 	public static String EditViewPart_ID;
 	public static String EditViewPart_Name;
 	public static String EditViewPart_QuestionSave;

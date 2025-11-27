@@ -51,20 +51,20 @@ import ru.dip.ui.table.table.TableModel;
 
 public class DipTableModel implements KTableModel, IDipTableModel {
 	
-	private final DipTable fTable;
-	private final KTableComposite fTableComposite;
+	private DipTable fTable;
+	private KTableComposite fTableComposite;
 	private TableNode fRootNode;
 	private TableModel fRootTableModel;
 	private List<ParentNode> fParentsElements; 
 
 	// renderer & painters
-	private final IDCellRender fIdRender;
-	private final PresentationCellRender fPresentationRender;
-	private final HeaderCellRender fHeaderRender;
-	private final CommentCellRender fCommentCellRender;
-	private final PresentationPainter fPainter;
-	private final IDPainter fIDPainter;
-	private final CommentPainter fCommentPainter;
+	private IDCellRender fIdRender;
+	private PresentationCellRender fPresentationRender;
+	private HeaderCellRender fHeaderRender;
+	private CommentCellRender fCommentCellRender;
+	private PresentationPainter fPainter;
+	private IDPainter fIDPainter;
+	private CommentPainter fCommentPainter;
 
 	private int fColumnCount = 3;
 	
@@ -292,7 +292,8 @@ public class DipTableModel implements KTableModel, IDipTableModel {
 	 * Возвращает Expanded-узлы
 	 */
 	private List<IDipParent> expandedNodes(){
-		List<IDipParent> result =  fElements.parallelStream()
+		List<IDipParent> result =  fElements.stream()
+		//List<IDipParent> result =  fElements.parallelStream()
 		.filter(TableNode.class::isInstance)
 		.map(TableNode.class::cast)
 		.filter(TableNode::expand)
@@ -360,7 +361,8 @@ public class DipTableModel implements KTableModel, IDipTableModel {
 
 		// подготовка идентификаторов
 		if (isShowId()) {
-			elements.parallelStream()
+			//elements.parallelStream()
+			elements.stream()
 				.map(TableElement.class::cast)
 				.forEach(DipTableModel.this::prepareID);
 		}
@@ -391,7 +393,8 @@ public class DipTableModel implements KTableModel, IDipTableModel {
 			paralles.add(element);
 			
 		}
-		paralles.parallelStream()
+		//paralles.parallelStream()
+		paralles.stream()
 			.map(TableElement.class::cast)
 			.forEach(DipTableModel.this::preparePresentation);
 		notParallel.stream()
@@ -415,7 +418,8 @@ public class DipTableModel implements KTableModel, IDipTableModel {
 		if (isShowId()) {
 			List<IDipTableElement> elements = new ArrayList<>();
 			elementsToUpdate.forEach(element -> computeElementsForUpdate(elements, element));
-			elements.parallelStream().forEach(el -> prepareID(el));
+			elements.stream().forEach(el -> prepareID(el));
+			//elements.parallelStream().forEach(el -> prepareID(el));
 		}
 		
 		// снимаем флаг
@@ -514,7 +518,8 @@ public class DipTableModel implements KTableModel, IDipTableModel {
 		List<IDipTableElement> elementsToUpdate = fElements.stream()
 				.filter(IDipTableElement::isVisible)
 				.collect(Collectors.toList());
-		elementsToUpdate.parallelStream().forEach(element -> idPainter().onlyMeasureElements((IDipTableElement) element));
+		elementsToUpdate.stream().forEach(element -> idPainter().onlyMeasureElements((IDipTableElement) element));
+		//elementsToUpdate.parallelStream().forEach(element -> idPainter().onlyMeasureElements((IDipTableElement) element));
 	}
 	
 	private void updateCommentColumn() {
@@ -1293,7 +1298,29 @@ public class DipTableModel implements KTableModel, IDipTableModel {
 			fEditedCell = (CellInfo) editedCell;
 		}
 	}
-		
+	
+	//=======================
+	
+	public void dispose() {
+		fTable = null;
+		fTableComposite = null;
+		fRootNode = null;
+		fRootTableModel = null;
+		fParentsElements = null;
+		fEditedCell = null;
+		fElements = null;
+		fNewElements = null;
+		fCondition = null;
+		fIdRender = null;
+		fPresentationRender = null;
+		fHeaderRender = null;
+		fCommentCellRender = null;
+		fPainter = null;
+		fIDPainter = null;
+		fCommentPainter = null;
+	}
+	
+	
 	//==================================
 	// NO USED
 	
@@ -1368,5 +1395,4 @@ public class DipTableModel implements KTableModel, IDipTableModel {
 			.run();
 		}
 	}
-
 }

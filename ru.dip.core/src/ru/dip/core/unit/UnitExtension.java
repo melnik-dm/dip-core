@@ -202,4 +202,9 @@ public abstract class UnitExtension implements IUnitExtension, IDipDocumentEleme
 	public boolean isDisabledInDocument() {
 		return fUnit.isDisabledInDocument();
 	}
+	
+	@Override
+	public void dispose() {
+		
+	}
 }

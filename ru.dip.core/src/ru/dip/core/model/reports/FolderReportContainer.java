@@ -174,4 +174,8 @@ public class FolderReportContainer implements IReportContainer, IDipElement {
 	public void addReportChild(IFile resource) {
 		fReportContainer.addReportChild(resource);
 	}
+
+	@Override
+	public void dispose() {		
+	}
 }

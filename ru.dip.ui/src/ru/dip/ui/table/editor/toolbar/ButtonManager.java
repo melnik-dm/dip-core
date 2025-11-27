@@ -100,6 +100,8 @@ public class ButtonManager {
 	private ToolItem fDiffModeButton;
 	//private ToolItem fTestButton;
 	
+	private IdModeDropdownSelectionListener fListenerId;
+
 	// filter toolbar
 	private FilterToolBar fFilterToolBar;
 	private boolean fShowFilterGroup = false;
@@ -235,12 +237,13 @@ public class ButtonManager {
 	
 	}
 	
+	
 	private void createIdModeButton(ToolBar toolBar){
 		fFirstColumnButton = new ToolItem(toolBar, SWT.PUSH);
 		fFirstColumnButton.setToolTipText(Messages.ButtonManager_IDCellTooltip);
 		fFirstColumnButton.setImage(ImageProvider.FIRST_COLUMN);	
-		IdModeDropdownSelectionListener listenerOne = new IdModeDropdownSelectionListener(fFirstColumnButton);
-		fFirstColumnButton.addSelectionListener(listenerOne);
+		fListenerId = new IdModeDropdownSelectionListener(fFirstColumnButton);
+		fFirstColumnButton.addSelectionListener(fListenerId);
 	}
 	
 	class IdModeDropdownSelectionListener extends SelectionAdapter {
@@ -959,7 +962,6 @@ public class ButtonManager {
 		}
 	}
 	
-	
 	private void applyFilter() {
 		boolean result = fEditor.kTable().applyFilter(fFilterToolBar.getText());		
 		if (result) {
@@ -1153,6 +1155,64 @@ public class ButtonManager {
 	public void addMouseListener(MouseListener listener) {
 		fMouseListener = listener;
 		fComposite.addMouseListener(listener);
+	}
+	
+	public void removeMouseListener() {
+		if (fMouseListener != null && fComposite != null && !fComposite.isDisposed()) {
+			fComposite.removeMouseListener(fMouseListener);
+		}
+		fMouseListener = null;
+	}
+	
+	//==============================
+	// dispose
+	
+	
+	public void dispose() {
+		removeMouseListener();
+
+		fEditor = null;
+		fBindingService = null;
+		fTableComposite = null;
+		fParent = null;
+		fComposite = null;
+		fToolBar = null;
+		
+		if (!fFirstColumnButton.isDisposed()) {
+			fFirstColumnButton.removeSelectionListener(fListenerId);
+		}
+		fListenerId = null;
+		fFirstColumnButton = null;
+		
+		
+		fListViewButton = null;
+		fExpandAllButton = null;
+		fColapseAllButton = null;
+		fNumerationButton = null;
+		fFixContentButton = null;
+		fCheckSpellingButton = null;
+		fReviewButton = null;
+		fFormProperties = null;
+		fHideDisableObjs = null;
+		fHiglightGlossaryButton = null;
+
+		fNewFileButton = null;
+		fNewFolderButton = null;
+		fUpButton = null;
+		fDownButton = null;
+		fIntoFolderButton = null;
+		fDeleteButton = null;
+
+		fOpenGlossaryButton = null;
+		fExportButton = null;
+		fShowIDButton = null;
+		fOpenIDButton = null;
+		fOpenImageView = null;
+		fOpenTableView = null;
+
+		fNumerationListener = null;
+		fUpdateButton = null;
+		fDiffModeButton = null;
 	}
 	
 	//============================

@@ -32,34 +32,25 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 
-import ru.dip.core.model.DipProject;
-import ru.dip.core.unit.TextPresentation;
-import ru.dip.core.utilities.DipUtilities;
-import ru.dip.core.utilities.FileUtilities;
-import ru.dip.core.utilities.TagStringUtilities;
-import ru.dip.core.utilities.UmlUtilities;
-import ru.dip.core.utilities.xml.XmlStringUtilities;
+import ru.dip.core.external.editors.IDipHtmlRenderExtension;
+import ru.dip.core.external.editors.IDipImageRenderExtension;
+import ru.dip.core.utilities.EditorUtils;
 import ru.dip.editors.Messages;
-import ru.dip.editors.md.MDEditor;
 import ru.dip.editors.utilities.image.ImageProvider;
-import ru.dip.table.editor.MultiPageTableEditor;
 import ru.dip.ui.action.hyperlink.ReqLink;
 
 public class DipView extends ViewPart implements /*ISelectionListener,*/ IPropertyListener {
 
 	public static final String ID = Messages.DipView_ID;
 
-	public enum ViewType {
-		UML, DOT, MD, TABLE
-	}
 	
 	// model
 	@SuppressWarnings("unused")
-	private ViewType fViewType;
 	private double fZoom = 1;
 	private IEditorPart fEditor;	
 	// control
@@ -68,6 +59,7 @@ public class DipView extends ViewPart implements /*ISelectionListener,*/ IProper
 	private Composite fComposite;
 	private Label fLabel;
 	private boolean fIsImageComposite = false;
+	private Image fImage;
 	
 	public DipView() {
 	}
@@ -77,6 +69,10 @@ public class DipView extends ViewPart implements /*ISelectionListener,*/ IProper
 		super.init(site);
 		IToolBarManager toolbar = getViewSite().getActionBars().getToolBarManager();
 		createToolbar(toolbar);
+		
+		IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+		page.getWorkbenchWindow().getActivePage().addPartListener(new DipViewListener(this));
+
 	}
 	
 	private void createToolbar(IToolBarManager toolbarManager){
@@ -99,14 +95,26 @@ public class DipView extends ViewPart implements /*ISelectionListener,*/ IProper
 	}
 
 	private void setNullComposite() {
+		fImage = null;
 		fIsImageComposite = false;
-		fViewType = null;
 		layoutComposite();
 		fComposite.layout();
 		fParentComposite.layout();
 	}
-	
+
+	private void setImageComposite(Image image) {
+		fImage = image;
+		fIsImageComposite = true;
+		layoutComposite();
+		fScrolledComposite.setMinSize(image.getBounds().width, image.getBounds().height);
+		fLabel = new Label(fComposite, SWT.NULL);
+		fLabel.setImage(image);
+		fComposite.layout();
+		fParentComposite.layout();
+	}
+
 	private void setHtmlComposite(String html, IFile file) {
+		fImage = null;
 		fIsImageComposite = false;
 		layoutComposite();
 		Browser browser = new Browser(fComposite, SWT.NONE);
@@ -158,61 +166,53 @@ public class DipView extends ViewPart implements /*ISelectionListener,*/ IProper
 				if (fComposite.isDisposed()) {
 					return;
 				}
-				if (source instanceof MDEditor) {
+				if (source instanceof IDipImageRenderExtension) {
 					fEditor = (IEditorPart) source;
-					changeMD((MDEditor) source, propId);
-					fViewType = ViewType.MD;
-				} else if (source instanceof MultiPageTableEditor) {
-					changeTable((MultiPageTableEditor) source, propId);
-					fViewType = ViewType.TABLE;
-				}
+					changeImageRenderEditor((IDipImageRenderExtension) source, propId);
+				} else if (source instanceof IDipHtmlRenderExtension) {
+					fEditor = (IEditorPart) source;
+					changeHtmlRenderEditor((IDipHtmlRenderExtension) source, propId);
+				} 
 			}
 		});
 	}
+	
 
-	private void changeMD(MDEditor mdEditor, int propId) {
-		if (propId == MDEditor.SAVE_EVENT || propId == MDEditor.VISIBLE_EVENT) {
-			FileEditorInput input = (FileEditorInput) mdEditor.getEditorInput();
-			IFile file = input.getFile();
-			String html = UmlUtilities.getHtmlFromMDText(file, mdEditor.getUnit());
-			setHtmlComposite(html, file);
-		}
-	}
-	
-	private void changeTable(MultiPageTableEditor tableEditor, int propId) {
-		if (propId == MultiPageTableEditor.SAVE_EVENT || propId == MultiPageTableEditor.VISIBLE_EVENT) {
-			FileEditorInput input = (FileEditorInput) tableEditor.getEditorInput();
-			IFile file = input.getFile();
-			String html = FileUtilities.readFile(file, ""); //$NON-NLS-1$
-			html = addBorderAttr(html);
-			html = changeLinks(html, file);		
-			setHtmlComposite(html, file);
-		}
-	}
-	
-	private String addBorderAttr(String original) {
-		String[] lines = original.split("\n");			 //$NON-NLS-1$
-		if (lines.length > 0) {
-			String tag = lines[0];
-			String newTag = XmlStringUtilities. changeValueAttribut("border", "1", tag); //$NON-NLS-1$ //$NON-NLS-2$
-			lines[0] = newTag;
-			StringBuilder builder = new StringBuilder();
-			for (String str : lines) {
-				builder.append(str);
-				builder.append(TagStringUtilities.lineSeparator());
+	private void changeImageRenderEditor(IDipImageRenderExtension imageRenderEditor, int propId) {
+		if (propId == EditorUtils.SAVE_EVENT || propId == EditorUtils.VISIBLE_EVENT) {
+			fImage = imageRenderEditor.renderImage();
+			
+			if (propId == EditorUtils.SAVE_EVENT){
+				fImage = resize(fImage);
+			} else {
+				fZoom = 1;
 			}
-			return builder.toString();
+			if (propId == EditorUtils.VISIBLE_EVENT) {
+				imageRenderEditor.addPropertyListener(this);
+			}		
+			setImageComposite(fImage);
+		} else if (propId == EditorUtils.HIDE_EVENT) {
+			setNullComposite();
+			imageRenderEditor.removePropertyListener(this);		
 		}
-		return original;
+	}
+
+
+	private void changeHtmlRenderEditor(IDipHtmlRenderExtension htmlRenderEditor, int propId) {
+		if (propId == EditorUtils.SAVE_EVENT || propId == EditorUtils.VISIBLE_EVENT) {
+			String html = htmlRenderEditor.getHtmlPresentation();
+			setHtmlComposite(html, htmlRenderEditor.getFile());
+			if (propId == EditorUtils.VISIBLE_EVENT) {
+				htmlRenderEditor.addPropertyListener(this);
+			}
+		} else if (propId == EditorUtils.HIDE_EVENT) {
+			setNullComposite();
+			htmlRenderEditor.removePropertyListener(this);		
+		}
 	}
 	
-	private String changeLinks(String original, IFile file) {
-		DipProject dipProject = DipUtilities.findDipProject(file);
-		if (original != null && !original.isEmpty() && dipProject != null) {
-			return TextPresentation.prepareTextWithoutUnit(original, dipProject);
-		}
-		return original;
-	}
+
+
 	
 	//=========================
 	// ZOOM
@@ -260,10 +260,10 @@ public class DipView extends ViewPart implements /*ISelectionListener,*/ IProper
 		public void run() {
 			if (fIsImageComposite){
 				fZoom = 1;
-				if (fEditor instanceof MDEditor) {
-					changeMD((MDEditor) fEditor, MDEditor.VISIBLE_EVENT);
-				} else if (fEditor instanceof MultiPageTableEditor) {
-					changeTable((MultiPageTableEditor) fEditor, MultiPageTableEditor.VISIBLE_EVENT);
+				if (fEditor instanceof IDipImageRenderExtension) {
+					changeImageRenderEditor((IDipImageRenderExtension) fEditor, EditorUtils.VISIBLE_EVENT);
+				} else if (fEditor instanceof IDipHtmlRenderExtension) {
+					changeHtmlRenderEditor((IDipHtmlRenderExtension) fEditor, EditorUtils.VISIBLE_EVENT);
 				}
 			}
 		}
@@ -303,6 +303,14 @@ public class DipView extends ViewPart implements /*ISelectionListener,*/ IProper
 		fParentComposite.layout();
 	}
 	
+	private Image resize(Image image){	
+		Rectangle rectangle = image.getBounds();
+		int width = (int) (rectangle.width * fZoom);
+		int height = (int) (rectangle.height * fZoom);
+		return resize(image, width ,height);
+	}
+	
+	
 	private Image resizePlus(Image image){		
 		Rectangle rectangle = image.getBounds();
 		int width = (int) (rectangle.width * 1.2);
@@ -332,7 +340,7 @@ public class DipView extends ViewPart implements /*ISelectionListener,*/ IProper
 		int width = fParentComposite.getBounds().width;
 		int height = fParentComposite.getBounds().height;
 		Image image = fLabel.getImage();		
-		int imageWidth = image.getBoundsInPixels().width;
+		int imageWidth = image.getBounds().width;
 		int imageHeight = image.getBounds().height;
 		double widthK = (double) width / imageWidth;
 		double heightK = (double) height / imageHeight;		
