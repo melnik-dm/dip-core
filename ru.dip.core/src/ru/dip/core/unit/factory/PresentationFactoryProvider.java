@@ -27,6 +27,7 @@ import ru.dip.core.unit.ImagePresentation;
 import ru.dip.core.unit.PagebreakPresentation;
 import ru.dip.core.unit.PlantUmlPresentation;
 import ru.dip.core.unit.ReportRefPresentation;
+import ru.dip.core.unit.TableUnitPresentation;
 import ru.dip.core.unit.TextPresentation;
 import ru.dip.core.unit.TocRefPresentation;
 import ru.dip.core.unit.UnitType;
@@ -49,6 +50,7 @@ public class PresentationFactoryProvider {
 		fFactoryByType.put(UnitType.TEXT, TextPresentation::new);
 		fFactoryByType.put(UnitType.MARKDOWN, MarkDownPresentation::new);
 		fFactoryByType.put(UnitType.SUBMARKDOWN, SubMarkdownPresentation::new);
+		fFactoryByType.put(UnitType.TABLE, TableUnitPresentation::new);
 		fFactoryByType.put(UnitType.HTML, HtmlUnitPresentation::new);
 		fFactoryByType.put(UnitType.CSV, CsvUnitPresentation::new);
 		fFactoryByType.put(UnitType.HTML_IMAGE, HtmlImagePresentation::new);
