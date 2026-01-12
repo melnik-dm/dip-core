@@ -516,7 +516,7 @@ public class DipTableEditor extends EditorPart implements IResourceChangeListene
 	
 	@Override
 	public void setFindMode(boolean value) {
-		kTable().setFindMode(value);
+		kTable().getTableSettings().setFindMode(value);
 	}
 	
 	@Override

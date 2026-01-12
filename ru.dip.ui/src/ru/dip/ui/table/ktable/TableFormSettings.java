@@ -32,7 +32,7 @@ public class TableFormSettings implements IFormSettings {
 	
 	@Override
 	public boolean isFormPrefEnable() {
-		return fTableSettings.isFormShowPrefernciesEnable();
+		return fTableSettings.isFormShowPreferenciesEnable();
 	}
 
 	@Override

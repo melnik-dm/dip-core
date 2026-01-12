@@ -202,7 +202,7 @@ public class SpellCheckView extends ViewPart implements IPropertyListener {
 		}
 		if (source instanceof DipTableEditor) {
 			DipTableEditor editor = (DipTableEditor) source;
-			if (editor.kTable().isCheckSpellingEnable()) {
+			if (editor.kTable().getTableSettings().isCheckSpellingEnable()) {
 				DipProject dipProject = WorkbenchUtitlities.getDipProjectFromOpenedEditor();
 				fViewer.setInput(dipProject);	
 				return;

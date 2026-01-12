@@ -18,20 +18,12 @@ import java.util.List;
 import org.eclipse.swt.graphics.Color;
 
 import ru.dip.core.model.interfaces.IDipDocumentElement;
-import ru.dip.core.model.interfaces.IUnitPresentation;
-import ru.dip.core.unit.ChangeLogPresentation;
-import ru.dip.core.unit.GlossaryPresentation;
-import ru.dip.core.unit.TablePresentation;
-import ru.dip.core.unit.TextPresentation;
-import ru.dip.core.unit.TocRefPresentation;
-import ru.dip.core.unit.form.FormPresentation;
-import ru.dip.core.unit.md.MarkDownPresentation;
 import ru.dip.core.utilities.ui.IBackground;
 import ru.dip.ui.table.ktable.diff.DiffModel;
 import ru.dip.ui.table.table.TableSettings;
 
 
-public class TableElement implements IBackground, IPresentationElement, IDipIdElement, IDipTableElement {
+public class TableElement implements IBackground, IDipIdElement, IDipTableElement {
 	
 	private static final int DEFAULT_PRESENTATION_WIDTH = 200;
 	
@@ -78,6 +70,7 @@ public class TableElement implements IBackground, IPresentationElement, IDipIdEl
 	//===================
 	// entity
 	
+	@Override
 	public boolean isVisible() {
 		if (fParent != null && !fParent.children().contains(this)) {
 			return false;
@@ -89,93 +82,14 @@ public class TableElement implements IBackground, IPresentationElement, IDipIdEl
 		return true;
 	}
 	
-
-	/**
-	 * Те элементы, где возможно изменение шрифта папки, описание, текстовое
-	 * содержимое (md, формы, текст)
-	 */
-	public boolean hasFontPresentation() {
-		if (isPresentation()) {
-			IUnitPresentation presentation = (IUnitPresentation) fDipDocElement;
-			TablePresentation tablePresentation = presentation.getPresentation();
-			return tablePresentation instanceof TextPresentation 
-					|| tablePresentation instanceof MarkDownPresentation
-					|| tablePresentation instanceof FormPresentation
-					|| tablePresentation instanceof ChangeLogPresentation
-					|| tablePresentation instanceof TocRefPresentation
-					|| tablePresentation instanceof GlossaryPresentation;
-		} else {
-			return true;
-		}
-	}
-	
 	//=======================
 	// linked elements
-
-	public List<IDipTableElement> linkedWithibleElements() {
-		if (fParent == null) {
-			return List.of(this);
-		}
-		return fParent.linkedElements(this, HideElements.EXCLUDE);
-	}
-	
-	/**
-	 * С учетом пустых Description
-	 */
-	@Override
-	public List<IDipTableElement> allLinkedElements() {
-		if (fParent == null) {
-			return List.of(this);
-		}
-		return fParent.linkedElements(this, HideElements.INCLUDE);
-	}
 	
 	public int linkedTotalHeight() {
 		return getLinkedElements().stream()
 				.filter(IPresentationElement.class::isInstance)
 				.mapToInt(e ->  get(ContentId.PRESENTATION, ContentType.HEIGHT, Integer.class))				
 				.sum();
-	}
-	
-	public IDipTableElement startElement(HideElements hideElements) {
-		if (fParent == null) {
-			return this;
-		}
-		return fParent.startElement(this, hideElements);
-	}
-	
-	public IDipTableElement endElement(HideElements hideElements) {
-		if (fParent == null) {
-			return this;
-		}
-		return fParent.endElement(this, hideElements);
-	}
-	
-	@Override
-	public boolean isFirst() {
-		return fNumber == 0;
-	}
-	
-	@Override
-	public boolean isLast() {
-		return fNumber == getLinkedElements().size() - 1;
-	}
-	
-	public void setLinkedElements(List<IDipTableElement> linkedElements) {
-		fLinkedElements = linkedElements;
-	}
-	
-	public List<IDipTableElement> getLinkedElements() {
-		return fLinkedElements;
-	}
-	
-	public void setNumber(int number) {
-		fNumber = number;
-	}
-	
-	@Override
-	public int getNumber() {
-		return fNumber;
 	}
 	
 	//=======================
@@ -186,19 +100,19 @@ public class TableElement implements IBackground, IPresentationElement, IDipIdEl
 		return fDipDocElement;
 	}
 	
-	
 	//=======================
 	// height
 	
 	@Override
-	public int height(IDipTableModel model) {
+	public int height(IDipTableModel model) {		
 		int fHeight = getInt(ContentId.PRESENTATION, ContentType.HEIGHT);
 		if (fHeight == 0 && isAbstractField()) {
 			return 0;
 		}
+				
 		int result = fHeight;		
 		int fIdHeight = getInt(ContentId.ID, ContentType.HEIGHT);
-
+		
 		// compare with id
 		if (model.isShowId() && fIdHeight > result) {
 			if (isAbstractField()) {
@@ -227,14 +141,21 @@ public class TableElement implements IBackground, IPresentationElement, IDipIdEl
 		return result;
 	}
 
-	
-	//========================
-	// Colors
+	/**
+	 * Высота основного комментария
+	 */
+	@Override
+	public int getCommentMainHeight() {
+		return fCommentMainHeight;
+	}
 	
 	@Override
-	public void setBackground(Color background) {
-		put(ContentId.PRESENTATION, ContentType.BACKGROUND, background);
+	public void setCommentMainHeight(int mainCommentHeight) {
+		fCommentMainHeight = mainCommentHeight;
 	}
+	
+	//=======================
+	// content
 	
 	@Override
 	public void put(ContentId id, ContentType type, Object obj) {
@@ -251,6 +172,14 @@ public class TableElement implements IBackground, IPresentationElement, IDipIdEl
 		return fContent.getInt(id, type);
 	}
 	
+	//========================
+	// Colors
+	
+	@Override
+	public void setBackground(Color background) {
+		put(ContentId.PRESENTATION, ContentType.BACKGROUND, background);
+	}
+		
 	@Override
 	public Color background() {
 		if (parent() == null) {
@@ -288,7 +217,6 @@ public class TableElement implements IBackground, IPresentationElement, IDipIdEl
 	//============================
 	// getters & setters
 	
-
 	public void setSelection(boolean value) {
 		fSelect = value;
 	}
@@ -300,24 +228,9 @@ public class TableElement implements IBackground, IPresentationElement, IDipIdEl
 	public ITableNode parent() {
 		return fParent;
 	}
-	
-	
+		
 	public IDipTableModel model() {
 		return fParent.model();
-	}
-	
-	//=======================
-	// id getters/setters
-	
-	/**
-	 * Высота основного комментария
-	 */
-	public int getCommentMainHeight() {
-		return fCommentMainHeight;
-	}
-	
-	public void setCommentMainHeight(int mainCommentHeight) {
-		fCommentMainHeight = mainCommentHeight;
 	}
 	
 	//==========================
@@ -352,6 +265,30 @@ public class TableElement implements IBackground, IPresentationElement, IDipIdEl
 		return true;
 	}
 
+	
+	@Override
+	public IDipTableElement self() {
+		return this;
+	}
+	
+	@Override
+	public void setNumber(int number) {
+		fNumber = number;
+	}
+	
+	@Override
+	public int getNumber() {
+		return fNumber;
+	}
 
-
+	@Override
+	public void setLinkedElements(List<IDipTableElement> linkedElements) {
+		fLinkedElements = linkedElements;
+	}
+	
+	@Override
+	public List<IDipTableElement> getLinkedElements() {
+		return fLinkedElements;
+	}
+	
 }

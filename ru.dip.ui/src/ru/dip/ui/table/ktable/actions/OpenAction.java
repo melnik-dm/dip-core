@@ -13,11 +13,19 @@
  *******************************************************************************/
 package ru.dip.ui.table.ktable.actions;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.swt.widgets.Shell;
+
 import ru.dip.core.model.DipUnit;
-import ru.dip.core.model.interfaces.IDipParent;
 import ru.dip.core.model.interfaces.IDipDocumentElement;
+import ru.dip.core.model.interfaces.IDipParent;
+import ru.dip.core.model.interfaces.IDipUnit;
+import ru.dip.core.model.interfaces.IUnitPresentation;
+import ru.dip.core.unit.ReportRefPresentation;
 import ru.dip.core.unit.UnitType;
+import ru.dip.core.utilities.WorkbenchUtitlities;
 import ru.dip.ui.Messages;
+import ru.dip.ui.glossary.GlossaryDialog;
 import ru.dip.ui.table.ktable.KTableComposite;
 
 public class OpenAction extends DocumentAction {
@@ -66,5 +74,35 @@ public class OpenAction extends DocumentAction {
 	public void enableSeveralSelection() {
 		setEnabled(false);
 	}
+	
+	//==============================
+	// open utils
+	
+	public static void openFile(IDipUnit unit, Shell shell) {
+		IFile file = (IFile) unit.resource();
+		IUnitPresentation presentation = unit.getUnitPresentation();
+		if (presentation != null && presentation.getUnitType() == UnitType.REPROT_REF) {
+			ReportRefPresentation reportPresentation = (ReportRefPresentation) presentation.getPresentation();
+			if (reportPresentation != null) {
+				file = reportPresentation.getReportFile();
+			}
+		}
+		if (presentation != null && presentation.getUnitType() == UnitType.GLOS_REF) {
+			//doOpenGlossaryDialog();
+			GlossaryDialog.openGlossaryDialog(unit.dipProject(), shell);
+			return;
+		}
+		if (presentation.getUnitType() == UnitType.PAGEBREAK) {
+			return;
+		}
+		
+		if (unit.isReadOnly()) {
+			WorkbenchUtitlities.openReadOnlyErrorMessage(shell, unit);
+			return;
+		}
+
+		WorkbenchUtitlities.openFile(file);
+	}
+	
 
 }

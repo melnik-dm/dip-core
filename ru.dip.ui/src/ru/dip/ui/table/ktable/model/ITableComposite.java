@@ -16,8 +16,9 @@ package ru.dip.ui.table.ktable.model;
 import ru.dip.core.model.finder.IFinder;
 import ru.dip.core.model.interfaces.IDipDocumentElement;
 import ru.dip.core.unit.form.IFormSettings;
+import ru.dip.ui.table.table.TableModel;
 
-public interface ITableComposite extends ITableSettings, ITableFormSettings {
+public interface ITableComposite {
 
 	IFinder getFinder();
 
@@ -33,4 +34,8 @@ public interface ITableComposite extends ITableSettings, ITableFormSettings {
 
 	void updateDescriptionFromCellEditor(IDipTableElement element, IDipDocumentElement dipDocElement,
 			String newContent);
+
+	TableModel model();
+	
+	ITableCompositeSetting getTableSettings();
 }

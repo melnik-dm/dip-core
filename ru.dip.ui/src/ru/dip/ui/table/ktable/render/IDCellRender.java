@@ -44,7 +44,7 @@ public class IDCellRender extends DipRender {
 	private void drawIdTableElement(GC gc, Rectangle rect, IDipTableElement tableElement, int col, int row) {
 		GCUtils.fillBackground(gc, rect, tableElement.idBackground());		
 		Rectangle indentRect = new Rectangle(rect.x, rect.y, rect.width, rect.height);				
-		if (!fModel.tableComposite().isOneListMode() && col == 0) {
+		if (!fModel.tableComposite().getTableSettings().isOneListMode() && col == 0) {
 			int indent = fModel.getIndent(tableElement) * 16;
 			// отрисовка иконки для фолдинга
 			if (hasFolding(tableElement)) {

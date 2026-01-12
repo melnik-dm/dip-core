@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -78,14 +77,12 @@ import ru.dip.core.exception.TmpCopyException;
 import ru.dip.core.model.DipFolder;
 import ru.dip.core.model.DipProject;
 import ru.dip.core.model.DipRoot;
-import ru.dip.core.model.DipTableContainer;
 import ru.dip.core.model.DipUnit;
 import ru.dip.core.model.IncludeFolder;
 import ru.dip.core.model.TocRef;
 import ru.dip.core.model.finder.FindSettings;
 import ru.dip.core.model.finder.IFinder;
 import ru.dip.core.model.finder.WordFinder;
-import ru.dip.core.model.glossary.GlossaryFolder;
 import ru.dip.core.model.interfaces.IDipDocumentElement;
 import ru.dip.core.model.interfaces.IDipElement;
 import ru.dip.core.model.interfaces.IDipParent;
@@ -94,9 +91,6 @@ import ru.dip.core.model.interfaces.IFindable;
 import ru.dip.core.model.interfaces.ISearchElementsHolder;
 import ru.dip.core.report.model.condition.Condition;
 import ru.dip.core.report.scanner.RuleScanner;
-import ru.dip.core.unit.ReportRefPresentation;
-import ru.dip.core.unit.UnitPresentation;
-import ru.dip.core.unit.UnitType;
 import ru.dip.core.unit.form.IFormSettings;
 import ru.dip.core.utilities.ArrayUtils;
 import ru.dip.core.utilities.DipTableUtilities;
@@ -126,13 +120,12 @@ import ru.dip.core.utilities.ui.swt.FontDimension;
 import ru.dip.core.utilities.ui.swt.KeyMode;
 import ru.dip.ktable.DipTable;
 import ru.dip.ui.Messages;
-import ru.dip.ui.action.hyperlink.ReqLink;
 import ru.dip.ui.controller.RenameController;
-import ru.dip.ui.glossary.GlossaryDialog;
 import ru.dip.ui.table.editor.DipTableEditor;
 import ru.dip.ui.table.ktable.TableSizeInteractor.CompositeControlListener;
 import ru.dip.ui.table.ktable.actions.EditCommentAction;
 import ru.dip.ui.table.ktable.actions.EditDescriptionAction;
+import ru.dip.ui.table.ktable.actions.OpenAction;
 import ru.dip.ui.table.ktable.actions.manager.AutoNumberingInteractor;
 import ru.dip.ui.table.ktable.actions.manager.CopyIdIneractor;
 import ru.dip.ui.table.ktable.actions.manager.CreateFileInteractor;
@@ -152,6 +145,7 @@ import ru.dip.ui.table.ktable.model.DipTableModel;
 import ru.dip.ui.table.ktable.model.HideElements;
 import ru.dip.ui.table.ktable.model.IDipTableElement;
 import ru.dip.ui.table.ktable.model.ITableComposite;
+import ru.dip.ui.table.ktable.model.ITableCompositeSetting;
 import ru.dip.ui.table.ktable.model.ITableNode;
 import ru.dip.ui.table.ktable.model.TableElement;
 import ru.dip.ui.table.ktable.model.TableNode;
@@ -203,22 +197,11 @@ public class KTableComposite extends Composite implements ITableComposite {
 
 	
 	// settings
-	private boolean fOneListMode = false; // отображение одним списком (без узлов)
-	private boolean fHighlightGlossMode = false;
-	private boolean fHideDisableObjEnable = false;
-	private boolean fCheckSpellingEnable = true;
-	private boolean fShowMDComment = true;
-	private boolean fShowStrictMDComment = true;
-	private boolean fShowFormNumeration = true;
-	private boolean fFormShowPreferenciesEnable = false;
-	private boolean fFixedContent = false;
-	private boolean fShowNumeration = true;
-	private boolean fShowFormVersion = false;
+	private TableCompositeSettings fSettings;
 	private IFormSettings fFormSettings;
 	
 	// find mode
 	private IFinder fFinder;
-	private boolean fFindMode = false;
 	// diff mode
 	private boolean fDinamicallyDiffMode = false;   // режим с равнения с HEAD/origin-HEAD в реальном времени 
 	private boolean fDiffMode = false; // режим сравнения с другим коммитом
@@ -236,6 +219,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 		super(parent, SWT.NONE);
 		fEditor = editor;
 		fModel = fEditor.model();
+		fSettings = new TableCompositeSettings(fModel.dipProject());
 		fActionStack = new ActionStack();
 		fSelector = new KDipTableSelector(this);
 		fColorInteractor = new KTableColorInteractor(this);
@@ -252,7 +236,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 		fDiffInteractor = new DiffInteractor(this);	
 		fPasteInteractor = new PasteInteractor(this);
 		fCopyIdIneractor = new CopyIdIneractor(this);
-		fFormSettings = new TableFormSettings(this);		
+		fFormSettings = new TableFormSettings(fSettings);		
 	}
 
 	/**
@@ -296,32 +280,17 @@ public class KTableComposite extends Composite implements ITableComposite {
 	
 	
 	public void setViewModeProperties() {
-		fEditor.getButtonManager().setListMode(fOneListMode);
-		fEditor.getButtonManager().setHighlightGlossMode(fHighlightGlossMode);
-
-		fFixedContent = fModel.dipProject().getProjectProperties().isFixedContentMode();
-		fEditor.getButtonManager().setFixContentMode(fFixedContent);
-
-		fShowNumeration = fModel.dipProject().getProjectProperties().isNumeration();
-
-		fShowFormNumeration = fModel.dipProject().getProjectProperties().isFormNumeration();
-
-		fHighlightGlossMode = fModel.dipProject().getProjectProperties().isHighlightGlossMode();
-		fShowMDComment = fModel.dipProject().getProjectProperties().isMdComment();
-		fShowStrictMDComment = fModel.dipProject().getProjectProperties().isStrictMdComment();
-		fFormShowPreferenciesEnable = fModel.dipProject().getProjectProperties().isFormShowPreferenciesEnable();
-
-		fCheckSpellingEnable = fModel.dipProject().getProjectProperties().isCheckSpellingEnable();
-		fEditor.getButtonManager().setCheckEnable(fCheckSpellingEnable);
-		fHideDisableObjEnable = fModel.dipProject().getProjectProperties().isHideDisableObjsEnable();
-		fEditor.getButtonManager().setHideDisableObjs(fHideDisableObjEnable);
-		fShowFormVersion = fModel.dipProject().getProjectProperties().isShowFormVersion();
+		fEditor.getButtonManager().setListMode(fSettings.isOneListMode());
+		fEditor.getButtonManager().setHighlightGlossMode(fSettings.isHighlightGloss());
+		fEditor.getButtonManager().setFixContentMode(fSettings.isFixedContent());
+		fEditor.getButtonManager().setCheckEnable(fSettings.isCheckSpellingEnable());
+		fEditor.getButtonManager().setHideDisableObjs(fSettings.isHideDisableObj());
 	}
 	
 	private void applyTableProperties() {
 		boolean refresh = false;
-		if (fOneListMode != fModel.dipProject().getProjectProperties().isOneListMode()) {
-			fOneListMode = fModel.dipProject().getProjectProperties().isOneListMode();
+		if (fSettings.isOneListMode() != fModel.dipProject().getProjectProperties().isOneListMode()) {
+			fSettings.setOneListMode(fModel.dipProject().getProjectProperties().isOneListMode());
 			applyListMode();
 			refresh = true;
 		}
@@ -334,7 +303,8 @@ public class KTableComposite extends Composite implements ITableComposite {
 		}
 
 		boolean fixedContent = fModel.dipProject().getProjectProperties().isFixedContentMode();
-		if (fixedContent != fFixedContent) {
+		if (fixedContent != fSettings.isFixedContent()) {
+			fSettings.setFixedContent(fixedContent);
 			refresh = true;
 		}
 		if (refresh) {
@@ -422,6 +392,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 		fListenerDisplay = Display.getDefault();
 		fListenerDisplay.addFilter(SWT.KeyUp, fKeyUpListener);
 		fListenerDisplay.addFilter(SWT.KeyDown, fKeyDownListner);
+		fTable.addFocusListener(fFocusLostListener = new FocusLostListener());
 	}
 	
 	private void removeKeyListener() {
@@ -549,13 +520,8 @@ public class KTableComposite extends Composite implements ITableComposite {
 	// ====================================
 	// scroll listener
 
-
-	
 	private void addScrolListener() {
 		fTable.addMouseWheelListener(fTableMouseWheelListener = new TableMouseWheelListener());
-		//Display.getDefault().addFilter(SWT.KeyUp, fKeyUpListener);
-		//Display.getDefault().addFilter(SWT.KeyDown, fKeyDownListner);
-		fTable.addFocusListener(fFocusLostListener = new FocusLostListener());
 	}
 
 	private class TableMouseWheelListener implements MouseWheelListener {
@@ -622,7 +588,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 		settings.updatePresentationFontSize(presentationSize);
 		settings.updateCommentFontSize(commentSize);
 		fDipTableModel.updateTableFont();
-		//refreshTable();
+		refreshTable();
 	}
 
 	private class FocusLostListener implements FocusListener {
@@ -654,8 +620,6 @@ public class KTableComposite extends Composite implements ITableComposite {
 
 	// =============================
 	// mouse listener (selection/folding)
-	
-	
 	
 	private void addMouseListener() {
 
@@ -695,7 +659,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 					return;
 				}
 				// folding
-				if (!fOneListMode && object instanceof TableNode) {
+				if (!fSettings.isOneListMode() && object instanceof TableNode) {
 					TableNode node = (TableNode) object;
 					boolean result = node.expandImageContains(new Point(e.x, e.y));
 					if (result) {
@@ -797,7 +761,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 				if (dipDocElement instanceof TocRef) {
 					WorkbenchUtitlities.openView(DipTocView.ID);
 				} else {
-					openFile((DipUnit) dipDocElement);
+					OpenAction.openFile((DipUnit) dipDocElement, getShell());
 				}
 			}		
 		}
@@ -832,7 +796,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 				if (((e.stateMask & SWT.CTRL) == SWT.CTRL) && (((e.stateMask & SWT.SHIFT) == SWT.SHIFT))
 						&& (e.keyCode == 'c' || e.keyCode == 'с')) {
 					if (fSelector.isOneSelected()) {
-						fCopyIdIneractor.doCopyID(fNumberClickC);
+						fCopyIdIneractor.doCopyID(fNumberClickC, fSelector.getSelectedOneDipDocElement());
 						fNumberClickC++;
 					}
 					return;
@@ -924,7 +888,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 		FindSettings settings = FindSettings.builder()
 			.caseSensetive(caseSensitive)
 			.findInId(findInId)
-			.findInDisableObjs(fHideDisableObjEnable)
+			.findInDisableObjs(fSettings.isHideDisableObj())
 			.build();
 			
 		fFinder.find(settings);
@@ -942,7 +906,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 			}
 		}
 		fEditor.updater().updateElements(children);
-		setFindMode(false);
+		fSettings.setFindMode(false);
 		fFinder = null;
 	}
 
@@ -950,8 +914,9 @@ public class KTableComposite extends Composite implements ITableComposite {
 	// show numeration
 
 	public void doShowNumeration() {
-		fShowNumeration = !fShowNumeration;
-		fModel.dipProject().getProjectProperties().setNumeration(fShowNumeration);
+		boolean newShowNumeration = !fSettings.isShowNumeration();
+		fSettings.setShowNumeration(newShowNumeration);
+		fModel.dipProject().getProjectProperties().setNumeration(newShowNumeration);
 		fDipTableModel.updateNodes();
 		refreshTable();
 	}
@@ -1018,17 +983,17 @@ public class KTableComposite extends Composite implements ITableComposite {
 	// ====================
 	// flat/nested mode
 
-	public void changeOneListMode(boolean selection) {
-		fOneListMode = selection;
+	public void changeOneListMode(boolean oneListMode) {
+		fSettings.setOneListMode(oneListMode);
 		applyListMode();
-		fEditor.getButtonManager().setListMode(fOneListMode);
-		fModel.dipProject().getProjectProperties().setOneListMode(fOneListMode);
+		fEditor.getButtonManager().setListMode(oneListMode);
+		fModel.dipProject().getProjectProperties().setOneListMode(oneListMode);
 		updateBackgrouColor();
 		asyncRefreshTree();
 	}
 
 	public void applyListMode() {
-		if (fOneListMode) {
+		if (fSettings.isOneListMode()) {
 			applyListView();
 		} else {
 			applyExtendedView();
@@ -1380,7 +1345,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 	private UpDownResult doUpOneElement(IDipTableElement element, IDipDocumentElement dipDocElement) {
 		if (dipDocElement != null) {
 			DipTableUtilities.up(dipDocElement);
-			element.up();
+			element.parent().up(element);
 			fEditor.updater().updateFolderOrder(element.parent());
 			fSelector.setTableElementSelection(element);
 			return new UpDownResult(true, dipDocElement);
@@ -1457,7 +1422,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 	private UpDownResult doDownOneElement(IDipTableElement element, IDipDocumentElement dipDocElement) {
 		if (dipDocElement != null) {
 			DipTableUtilities.down(dipDocElement);
-			element.down();
+			element.parent().down(element);
 			fEditor.updater().updateFolderOrder(element.parent());
 			fSelector.setTableElementSelection(element);
 			return new UpDownResult(false, dipDocElement);
@@ -1531,47 +1496,10 @@ public class KTableComposite extends Composite implements ITableComposite {
 	public void openFile() {
 		IDipDocumentElement selectedElement = fSelector.getSelectedOneDipDocElement();
 		if (selectedElement instanceof DipUnit) {
-			openFile((DipUnit) selectedElement);
-		} else if (selectedElement instanceof DipTableContainer) {
-			ReqLink.openTable(((DipTableContainer) selectedElement).getTable());
+			OpenAction.openFile((DipUnit) selectedElement, getShell());
 		}
 	}
 
-	private void openFile(DipUnit unit) {
-		IFile file = (IFile) unit.resource();
-		UnitPresentation presentation = unit.getUnitPresentation();
-		if (presentation != null && presentation.getUnitType() == UnitType.REPROT_REF) {
-			ReportRefPresentation reportPresentation = (ReportRefPresentation) presentation.getPresentation();
-			if (reportPresentation != null) {
-				file = reportPresentation.getReportFile();
-			}
-		}
-		if (presentation != null && presentation.getUnitType() == UnitType.GLOS_REF) {
-			doOpenGlossaryDialog();
-			return;
-		}
-		if (presentation.getUnitType() == UnitType.PAGEBREAK) {
-			return;
-		}
-		
-		if (unit.isReadOnly()) {
-			WorkbenchUtitlities.openReadOnlyErrorMessage(getShell(), unit);
-			return;
-		}
-
-		WorkbenchUtitlities.openFile(file);
-	}
-
-	public void doOpenGlossaryDialog() {
-		GlossaryFolder glosFolder = fModel.dipProject().getGlossaryFolder();
-		if (glosFolder == null) {
-			return;
-		}
-		GlossaryDialog dialog = new GlossaryDialog(getShell(), glosFolder);
-		dialog.open();
-	}
-
-	
 	//================================
 	// comments
 	
@@ -1639,60 +1567,64 @@ public class KTableComposite extends Composite implements ITableComposite {
 	// =========================================
 	// enable settings command
 
-	public void doHighlightGlossary(boolean selection) {
-		fHighlightGlossMode = selection;
-		fModel.dipProject().getProjectProperties().setHighlightGlossMode(fHighlightGlossMode);
+	public void doHighlightGlossary(boolean highlightGlossMode) {
+		fSettings.setHighlightGlossMode(highlightGlossMode);
+		fModel.dipProject().getProjectProperties().setHighlightGlossMode(highlightGlossMode);
 		fEditor.updater().updateTextElements();
 	}
 
 	public void doCheckSpellingEnable(boolean checkSpellingEnable) {
-		fCheckSpellingEnable = checkSpellingEnable;
-		fModel.dipProject().getProjectProperties().setCheckSpellingEnable(fCheckSpellingEnable);
+		fSettings.setCheckSpellingEnable(checkSpellingEnable);
+		fModel.dipProject().getProjectProperties().setCheckSpellingEnable(checkSpellingEnable);
 		fEditor.updater().updateTextElements();
 	}
 
 	public void doShowMDComment() {
-		fShowMDComment = !fShowMDComment;
-		fModel.dipProject().getProjectProperties().setMDComment(fShowMDComment);
+		boolean newShowMdComment = !fSettings.isShowMdComment();
+		fSettings.setShowMDComment(newShowMdComment);		
+		fModel.dipProject().getProjectProperties().setMDComment(newShowMdComment);
 	}
 	
 	public void doShowStrictMdComments() {
-		fShowStrictMDComment = !fShowStrictMDComment;
-		fModel.dipProject().getProjectProperties().setStrictMDComment(fShowStrictMDComment);
+		boolean newShowStricMdComment = !fSettings.isShowStrictMdComment();
+		fSettings.setShowStrictMDComment(newShowStricMdComment);
+		fModel.dipProject().getProjectProperties().setStrictMDComment(newShowStricMdComment);
 	}
 
 	public void doShowFormNumeration() {
-		fShowFormNumeration = !fShowFormNumeration;
-		fModel.dipProject().getProjectProperties().setFormNumeration(fShowFormNumeration);
+		boolean newShowFormNumeration = !fSettings.isShowFormNumeration();
+		fSettings.setShowFormNumeration(newShowFormNumeration);
+		fModel.dipProject().getProjectProperties().setFormNumeration(newShowFormNumeration);
 		fEditor.updater().updateFormElements(false);
 	}
 
 	public void doFormFilterPreferenciesEnable() {
-		fFormShowPreferenciesEnable = !fFormShowPreferenciesEnable;
-		fModel.dipProject().getProjectProperties().setFormFilterPreferenciesEnable(fFormShowPreferenciesEnable);
+		boolean newFormShowPreferenciesEnable = !fSettings.isFormShowPreferenciesEnable();
+		fSettings.setFormShowPreferenciesEnable(newFormShowPreferenciesEnable);
+		fModel.dipProject().getProjectProperties().setFormFilterPreferenciesEnable(newFormShowPreferenciesEnable);
 		fEditor.updater().updateFormElements(true);
 		updateTable();
 	}
 
-	public void changeFixContentMode(boolean selection) {
-		fFixedContent = selection;
+	public void changeFixContentMode(boolean fixedContent) {
+		fSettings.setFixedContent(fixedContent);
 		asyncRefreshTree();
-		fModel.dipProject().getProjectProperties().setFixedContentMode(fFixedContent);
+		fModel.dipProject().getProjectProperties().setFixedContentMode(fixedContent);
 	}
 
 	public void doHideDisableObjsEnable(boolean disableObjEnable) {
-		fHideDisableObjEnable = disableObjEnable;
-		fModel.dipProject().getProjectProperties().setHideDisableObjsEnable(fHideDisableObjEnable);
+		fSettings.setHideDisableObj(disableObjEnable);
+		fModel.dipProject().getProjectProperties().setHideDisableObjsEnable(disableObjEnable);
 		fDipTableModel.computeElements();
 		fEditor.refreshDipToc();
 		refreshTable();
 	}
 	
-	public void setShowVersionForm(boolean selection) {
-		fShowFormVersion = selection;
+	public void setShowVersionForm(boolean showFormVersion) {
+		fSettings.setShowFormVersion(showFormVersion);
 		fEditor.updater().updateIdentificators();
 		fTable.redraw();
-		fModel.dipProject().getProjectProperties().setShowFormVersion(fShowFormVersion);
+		fModel.dipProject().getProjectProperties().setShowFormVersion(showFormVersion);
 	}
 	
 	// ==========================
@@ -1740,7 +1672,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 					findable.appendWord(str, true);
 				}
 			}
-			setFindMode(true);			
+			fSettings.setFindMode(true);			
 		}
 
 		fDipTableModel.updateAllElements();	
@@ -1751,7 +1683,7 @@ public class KTableComposite extends Composite implements ITableComposite {
 	public void resetFilter() {
 		if (fDipTableModel.isFilterMode()) {
 			fDipTableModel.resetFilter();
-			setFindMode(false);
+			fSettings.setFindMode(false);
 			if (findables != null) {
 				findables.forEach(IFindable::cleanFind);
 			}
@@ -2101,69 +2033,11 @@ public class KTableComposite extends Composite implements ITableComposite {
 	public KDipTableSelector selector() {
 		return fSelector;
 	}
-
-	public boolean isHideDisableObjs() {
-		return fHideDisableObjEnable;
-	}
-
-	@Override
-	public boolean isHighlightGloss() {
-		return fHighlightGlossMode;
-	}
-
-	@Override
-	public boolean isFindMode() {
-		return fFindMode;
-	}
-
-	public void setFindMode(boolean newValue) {
-		fFindMode = newValue;
-	}
-
-	@Override
-	public boolean isOneListMode() {
-		return fOneListMode;
-	}
-
-	@Override
-	public boolean isCheckSpellingEnable() {
-		return fCheckSpellingEnable;
-	}
-
-	@Override
-	public boolean isShowMdComment() {
-		return fShowMDComment;
+	
+	public ITableCompositeSetting getTableSettings() {
+		return fSettings;
 	}
 	
-	public boolean isShowStrictMdComment() {
-		return fShowStrictMDComment;
-	}
-
-	@Override
-	public boolean isShowFormNumeration() {
-		return fShowFormNumeration;
-	}
-
-	@Override
-	public boolean isFormShowPrefernciesEnable() {
-		return fFormShowPreferenciesEnable;
-	}
-
-	@Override
-	public boolean isFixedContent() {
-		return fFixedContent;
-	}
-
-	@Override
-	public boolean isShowNumeration() {
-		return fShowNumeration;
-	}
-	
-	@Override
-	public boolean isShowFormVersion() {
-		return fShowFormVersion;
-	}
-
 	public boolean isCtrlPressed() {
 		return fCtrlPressed;
 	}

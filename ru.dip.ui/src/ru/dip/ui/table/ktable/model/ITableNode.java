@@ -13,21 +13,18 @@
  *******************************************************************************/
 package ru.dip.ui.table.ktable.model;
 
-import java.util.Collection;
 import java.util.List;
 
 import ru.dip.core.model.DipUnit;
 import ru.dip.core.model.interfaces.IDipParent;
 
-public interface ITableNode extends IDipTableElement {
+public interface ITableNode extends ITableElementContainer, ITablePaintable, IDipTableElement {
 
+	ITableNode parent();
+	
 	int level();
 
-	List<IDipTableElement> linkedElements(IDipTableElement startElement, HideElements exclude);
-
 	IDipParent dipDocElement();
-
-	IDipTableElement find(String movedElementName);
 
 	ITableNode addNewFolderToBegin(IDipParent parent);
 
@@ -36,8 +33,6 @@ public interface ITableNode extends IDipTableElement {
 	boolean expand();
 
 	void setExpand(boolean expand);
-
-	Collection<IDipTableElement> children();
 
 	List<IDipTableElement> visibleUnitElements();
 
@@ -55,11 +50,7 @@ public interface ITableNode extends IDipTableElement {
 
 	ITableNode addNewNeightborFolder(IDipParent dipParent, ITableNode tableNode, boolean before);
 
-	IDipTableElement startElement(IDipTableElement tableElement, HideElements hideElements);
-
-	IDipTableElement endElement(IDipTableElement tableElement, HideElements hideElements);
-
 	IDipTableElement addNewUnitToEnd(DipUnit unit);
 	
-	DipTableModel model();
+	IDipTableModel model();
 }

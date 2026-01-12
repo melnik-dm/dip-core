@@ -313,7 +313,7 @@ public class KTableColorInteractor {
 	private void applyDoubleClickMode(List<IDipTableElement> elements) {
 		Object object = fTableComposite.selector().getLastSelectObject();
 		if (object instanceof TableNode) {
-			if (fTableComposite.isOneListMode()) {
+			if (fTableComposite.getTableSettings().isOneListMode()) {
 				applyFlatDoubleClick(elements, ((TableNode) object).dipDocElement());
 			} else {
 				applyDoubleClickFolderMode(elements, ((TableNode) object).dipDocElement());

@@ -13,22 +13,8 @@
  *******************************************************************************/
 package ru.dip.ui.table.ktable.model;
 
-public interface ITableSettings {
-	
-	boolean isHighlightGloss();
+import ru.dip.core.model.interfaces.IDipDocumentElementHolder;
 
-	boolean isCheckSpellingEnable();
-
-	boolean isFindMode();
-
-	boolean isShowMdComment();
-	
-	boolean isShowNumeration();
-
-	boolean isFixedContent();
-	
-	boolean isOneListMode();
-
-	boolean isShowFormVersion();
+public interface IDipDocTablePaintable extends ITablePaintable, IDipDocumentElementHolder {
 
 }

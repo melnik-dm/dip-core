@@ -89,12 +89,12 @@ public class MoveInteractor {
 		if (movedElement instanceof TableNode) {
 			IDipParent targetParent = (IDipParent) fTargetParent.getChild(movedDipDocElement.dipName());
 			ITableNode newNode = fTargetNode.addNewNeightborFolder(targetParent, movedElement.parent(), true);
-			movedElement.delete();
+			movedElement.parent().delete(movedElement);
 			return newNode;
 		} else {
 			DipUnit unit = (DipUnit) fTargetParent.getChild(movedDipDocElement.dipName());			
 			IDipTableElement newElement = fTargetNode.addNewUnitToEnd(unit);
-			movedElement.delete();
+			movedElement.parent().delete(movedElement);
 			return newElement;
 		}
 	}

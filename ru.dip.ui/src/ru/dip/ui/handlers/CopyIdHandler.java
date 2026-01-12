@@ -25,6 +25,7 @@ import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.services.IServiceLocator;
 
+import ru.dip.core.model.interfaces.IDipDocumentElement;
 import ru.dip.ui.Messages;
 import ru.dip.ui.table.editor.DipTableEditor;
 import ru.dip.ui.table.ktable.actions.manager.CopyIdIneractor.CopyIdType;
@@ -63,7 +64,8 @@ public class CopyIdHandler extends AbstractHandler {
 		if (part instanceof DipTableEditor) {
 			DipTableEditor tableEditor = (DipTableEditor) part;
 			CopyIdType type = typeFromEvent(event);
-			tableEditor.kTable().copyIdInteractor().doCopyID(type);
+			IDipDocumentElement element = tableEditor.kTable().selector().getSelectedOneDipDocElement();
+			tableEditor.kTable().copyIdInteractor().doCopyID(type, element);
 		}
 		return null;
 	}

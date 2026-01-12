@@ -93,7 +93,7 @@ public class CommentPainter  {
 			contentProvider.setText(element, "");
 			return;
 		}
-		if (!fTableComposite.isShowStrictMdComment() || !comment.hasTextComments() || comment.isEmpty()) {
+		if (!fTableComposite.getTableSettings().isShowStrictMdComment() || !comment.hasTextComments() || comment.isEmpty()) {
 			updateCell(width, comment, element);
 			element.setCommentMainHeight(0);
 		} else {
@@ -161,7 +161,7 @@ public class CommentPainter  {
 	// DipComment
 	
 	private void updateCell(int width, IDipComment comment, IDipTableElement element) {
-		String text = fTableComposite.isShowStrictMdComment() ? comment.getFullContent() : comment.getCommentContent();
+		String text = fTableComposite.getTableSettings().isShowStrictMdComment() ? comment.getFullContent() : comment.getCommentContent();
 		if (text == null || text.isEmpty()) {
 			return;
 		}
@@ -217,7 +217,7 @@ public class CommentPainter  {
 		if (fTableComposite.selector().isSelectDipDocElement(dipDocElement.strong())) {
 			return true;
 		}		
-		return fTableComposite.tableModel().isFullComment() && !fTableComposite.isFixedContent();
+		return fTableComposite.tableModel().isFullComment() && !fTableComposite.getTableSettings().isFixedContent();
 	}
 		
 	//=======================

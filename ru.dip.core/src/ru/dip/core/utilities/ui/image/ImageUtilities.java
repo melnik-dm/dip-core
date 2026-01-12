@@ -110,7 +110,6 @@ public class ImageUtilities {
 		try {
 			return new Image(Display.getDefault(), imageData);
 		} catch (Exception e) {
-			// 
 			e.printStackTrace();
 			return null;
 		}

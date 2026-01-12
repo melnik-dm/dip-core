@@ -24,7 +24,8 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.egit.ui,
  org.eclipse.egit.core,
  org.eclipse.jgit,
- org.eclipse.core.expressions
+ org.eclipse.core.expressions,
+ ru.dip.ktable
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Export-Package: ru.dip.editors.editview,
  ru.dip.editors.formeditor.fieldpage,

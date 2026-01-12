@@ -20,15 +20,19 @@ public class GitTagModel {
 	private final String fHash;
 	private final String fTagName;
 	private final String fMessage;
-	private final RevTag fRevTag;
 	
 	public GitTagModel(String hash, String name, RevTag revTag) {
 		fHash = hash;
 		fTagName = name;
-		fRevTag = revTag;
 		fMessage = revTag.getFullMessage();
 	}
 	
+	public GitTagModel(String commitName, String tagName, String fullMessage) {
+		fHash = commitName;
+		fTagName = tagName;
+		fMessage = fullMessage;
+	}
+
 	public String getTagName() {
 		return fTagName;
 	}
@@ -46,8 +50,6 @@ public class GitTagModel {
 		builder.append(fTagName);
 		builder.append(" FullMessage: ");
 		builder.append(fMessage);
-		builder.append(" Author: ");
-		builder.append(fRevTag.getObject().getClass());
 		return builder.toString();
 	}
 

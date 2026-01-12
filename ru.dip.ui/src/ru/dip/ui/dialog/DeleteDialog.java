@@ -13,8 +13,6 @@
  *******************************************************************************/
 package ru.dip.ui.dialog;
 
-import java.text.MessageFormat;
-
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.osgi.util.TextProcessor;
@@ -31,11 +29,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import ru.dip.core.DipCorePlugin;
-import ru.dip.core.model.IncludeFolder;
 import ru.dip.core.model.DipElementType;
 import ru.dip.core.model.DipFolder;
 import ru.dip.core.model.DipProject;
+import ru.dip.core.model.IncludeFolder;
 import ru.dip.core.model.interfaces.IDipElement;
+import ru.dip.core.utilities.TagStringUtilities;
 import ru.dip.ui.Messages;
 
 public class DeleteDialog extends Dialog {
@@ -195,21 +194,21 @@ public class DeleteDialog extends Dialog {
 	private String getDialogMessage(){
 		if (containsOnlyProjects()) {
 			if (fElements.length == 1) {
-				return format(DeleteResourcesWizard_label_single_project, getResourceName(fElements[0]));
+				return TagStringUtilities.format(DeleteResourcesWizard_label_single_project, getResourceName(fElements[0]));
 			} else {
-				return  format(DeleteResourcesWizard_label_multi_projects, Integer.valueOf(fElements.length));
+				return  TagStringUtilities.format(DeleteResourcesWizard_label_multi_projects, Integer.valueOf(fElements.length));
 			}
 		} if (containsOnlyLinks()) { 
 			if (fElements.length == 1) {
-				return format(DeleteResourcesWizard_label_single_link, getResourceName(fElements[0]));
+				return TagStringUtilities.format(DeleteResourcesWizard_label_single_link, getResourceName(fElements[0]));
 			} else {
-				return  format(DeleteResourcesWizard_label_multi_links, Integer.valueOf(fElements.length));
+				return  TagStringUtilities.format(DeleteResourcesWizard_label_multi_links, Integer.valueOf(fElements.length));
 			}
 		} else {
 			if (fElements.length == 1) {
-				return format(DeleteResourcesWizard_label_single, getResourceName(fElements[0]));
+				return TagStringUtilities.format(DeleteResourcesWizard_label_single, getResourceName(fElements[0]));
 			} else {
-				return format(DeleteResourcesWizard_label_multi, Integer.valueOf(fElements.length));
+				return TagStringUtilities.format(DeleteResourcesWizard_label_multi, Integer.valueOf(fElements.length));
 			}
 		}		
 	}
@@ -238,11 +237,6 @@ public class DeleteDialog extends Dialog {
 			}
 		}
 		return true;
-	}
-	
-	// зачем тут public static
-	public static String format(String message, Object object) {
-		return MessageFormat.format(message, new Object[] { object});
 	}
 	
 	//========================

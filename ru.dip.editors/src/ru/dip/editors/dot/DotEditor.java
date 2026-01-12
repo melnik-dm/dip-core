@@ -1,22 +1,16 @@
-/********************************************************************** 
- * This file is part of DIP
- * 
+/******************************************************************************* * 
  * Copyright (c) 2025 Denis Melnik.
  * Copyright (c) 2025 Ruslan Sabirov.
  * Copyright (c) 2025 Andrei Motorin.
- * 
- * This program is free software: you can redistribute it and/or modify  
- * it under the terms of the GNU General Public License as published by  
- * the Free Software Foundation, version 3.
  *
- * This program is distributed in the hope that it will be useful, but 
- * WITHOUT ANY WARRANTY; without even the implied warranty of 
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
- * General Public License for more details.
+ * This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License 2.0
+ * which accompanies this distribution, and is available at
+ * https://www.eclipse.org/legal/epl-2.0/
  *
- * You should have received a copy of the GNU General Public License 
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
+ * SPDX-License-Identifier: EPL-2.0
+ *
+ *******************************************************************************/
 package ru.dip.editors.dot;
 
 import org.eclipse.core.resources.IFile;

@@ -14,12 +14,12 @@
 package ru.dip.ui.table.ktable.model;
 
 /**
- * Настройки отображения форм определяемы в редакторе Document
+ * Настройки отображения форм определяемые в редакторе Document
  */
 public interface ITableFormSettings {
 	
 	boolean isShowFormNumeration();
 	
-	boolean isFormShowPrefernciesEnable();
+	boolean isFormShowPreferenciesEnable();
 
 }

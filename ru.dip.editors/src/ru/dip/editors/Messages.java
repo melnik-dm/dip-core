@@ -100,6 +100,7 @@ public class Messages extends NLS {
 	public static String NumberListAction_Name;
 	public static String ParagraphAction_ID;
 	public static String ParagraphAction_Name;
+	public static String ReportEditor_ContentPageTitle;
 	public static String ReportEditor_ReportPageTitle;
 	public static String ReportEditor_RulesPageTitle;
 	public static String ReportPage_1;

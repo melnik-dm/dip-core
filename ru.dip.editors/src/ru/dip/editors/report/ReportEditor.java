@@ -35,13 +35,14 @@ import ru.dip.core.report.model.report.ReportEntry;
 import ru.dip.core.utilities.DipUtilities;
 import ru.dip.core.utilities.ResourcesUtilities;
 import ru.dip.editors.Messages;
+import ru.dip.editors.report.content.ContentPage;
 //import ru.dip.editors.report.content.ContentPage;
 import ru.dip.editors.report.xml.RulesXmlEditor;
 
 public class ReportEditor  extends  FormEditor {
 	
 	private ReportPage fReportPage;
-	//private ContentPage fContentPage;
+	private ContentPage fContentPage;
 	private RulesXmlEditor fRulesEditor;
 	
 	// model
@@ -72,7 +73,7 @@ public class ReportEditor  extends  FormEditor {
 	@Override
 	protected void addPages() {
 		addTextEntriesPage();		
-		//addContentPage();		
+		addContentPage();		
 		addTextEditorPage();
 		addPageListener();
 	}
@@ -86,15 +87,14 @@ public class ReportEditor  extends  FormEditor {
 		}
 	}
 	
-	/*private void addContentPage() {
-		fContentPage = new ContentPage(this);
+	private void addContentPage() {
+		fContentPage = new ContentPage(this, Messages.ReportEditor_ContentPageTitle);
 		try {
 			addPage(fContentPage);
 		} catch (PartInitException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}*/
+	}
 	
 	private void addTextEditorPage(){
 		fRulesEditor = new RulesXmlEditor(this);
@@ -121,10 +121,11 @@ public class ReportEditor  extends  FormEditor {
 	 */
 	private void updatePage() {
 		int activePage = getActivePage();
-		if (activePage == 0 && fProjectFile != null){
+		if (activePage <= 1 && fProjectFile != null){
 			long currentModifiedProjectTime = ResourcesUtilities.getLatestModifiedDate(fProjectFile);
 			if (currentModifiedProjectTime != fLastModifiedTime) {
 				fReportPage.update();
+				fContentPage.update();
 				fLastModifiedTime = currentModifiedProjectTime;
 			}
 		} 

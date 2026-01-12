@@ -34,7 +34,6 @@ import ru.dip.core.model.interfaces.IDipParent;
 import ru.dip.core.model.interfaces.IDipUnit;
 import ru.dip.core.model.interfaces.IUnitPresentation;
 import ru.dip.core.report.model.condition.Condition;
-import ru.dip.core.unit.UnitPresentation;
 import ru.dip.core.unit.UnitType;
 import ru.dip.ktable.DipTable;
 import ru.dip.ui.table.ktable.KTableComposite;
@@ -45,6 +44,7 @@ import ru.dip.ui.table.ktable.render.CommentPainter;
 import ru.dip.ui.table.ktable.render.HeaderCellRender;
 import ru.dip.ui.table.ktable.render.IDCellRender;
 import ru.dip.ui.table.ktable.render.IDPainter;
+import ru.dip.ui.table.ktable.render.PaintPresentationUtils;
 import ru.dip.ui.table.ktable.render.PresentationCellRender;
 import ru.dip.ui.table.ktable.render.PresentationPainter;
 import ru.dip.ui.table.table.TableModel;
@@ -432,7 +432,7 @@ public class DipTableModel implements KTableModel, IDipTableModel {
 
 	private void preparePresentation(TableElement element) {
 		int indent = 0;
-		if (fPresentationColumnNumber == 0 && !fTableComposite.isOneListMode()) {
+		if (fPresentationColumnNumber == 0 && !fTableComposite.getTableSettings().isOneListMode()) {
 			indent = getIndent(element) * 16;
 		}		
 		if (indent > 0) {
@@ -485,7 +485,7 @@ public class DipTableModel implements KTableModel, IDipTableModel {
 	
 	private void updatePresentation(IDipTableElement element) {
 		int indent = 0;
-		if (fPresentationColumnNumber == 0 && !fTableComposite.isOneListMode()) {
+		if (fPresentationColumnNumber == 0 && !fTableComposite.getTableSettings().isOneListMode()) {
 			indent = getIndent(element) * 16;
 		}		
 		if (indent > 0) {
@@ -510,7 +510,7 @@ public class DipTableModel implements KTableModel, IDipTableModel {
 	
 	public void updatePresentationFont() {
 		fElements.stream()
-			.filter(IDipTableElement::hasFontPresentation)
+			.filter(PaintPresentationUtils::hasFontPresentation)
 			.forEach(this::updatePresentation);
 	}
 	
@@ -753,7 +753,6 @@ public class DipTableModel implements KTableModel, IDipTableModel {
 	
 	@Override
 	public void setColumnWidth(int column, int width) {
-		
 		if (!fTableComposite.isCtrlPressed()) {
 			return;
 		}
@@ -942,8 +941,7 @@ public class DipTableModel implements KTableModel, IDipTableModel {
 	}
 	
 	public TableNode findNode(IDipParent parent) {
-		
-		ArrayList<IDipParent> parents = new ArrayList<>();
+		List<IDipParent> parents = new ArrayList<>();
 		IDipParent current = parent;
 		if (parent == fRootNode.dipDocElement()) {
 			return fRootNode;
@@ -1391,7 +1389,7 @@ public class DipTableModel implements KTableModel, IDipTableModel {
 	@Override
 	public void saveUnit(String startContent, String newContent, Object object) {
 		if (object instanceof IDipUnit) {
-			new EditUnitAction(tableComposite(), startContent, newContent,  (UnitPresentation) object)
+			new EditUnitAction(tableComposite(), startContent, newContent,  (IDipUnit) object)
 			.run();
 		}
 	}

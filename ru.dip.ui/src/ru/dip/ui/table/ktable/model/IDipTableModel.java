@@ -15,6 +15,7 @@ package ru.dip.ui.table.ktable.model;
 
 import ru.dip.ktable.DipTable;
 import ru.dip.ktable.model.IKTableModel;
+import ru.dip.ui.table.table.TableModel;
 
 public interface IDipTableModel extends IKTableModel  {
 	
@@ -52,13 +53,11 @@ public interface IDipTableModel extends IKTableModel  {
 
 	boolean isShowComment();
 
-	
 
 	//??
 	DipTable getTable();
 
-	//ITableComposite tableComposite();
+	ITableComposite tableComposite();
 
-	//ITableInputModel getTableModel();
-
+	TableModel getTableModel();
 }

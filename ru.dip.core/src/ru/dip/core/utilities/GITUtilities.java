@@ -71,7 +71,7 @@ import org.eclipse.team.core.RepositoryProvider;
 
 import ru.dip.core.DipCorePlugin;
 import ru.dip.core.model.DipProject;
-import ru.dip.core.model.interfaces.IDipDocumentElement;
+import ru.dip.core.model.interfaces.IDipElement;
 import ru.dip.core.utilities.git.CommitCache;
 import ru.dip.core.utilities.git.CommitInfo;
 import ru.dip.core.utilities.git.GitRevisionModel;
@@ -183,34 +183,32 @@ public class GITUtilities {
 	}
 		
 	
-	public static List<GitTagModel> getTagModelss(String repoPath, String from) throws NoHeadException, GitAPIException {
+	public static List<GitTagModel> getTagModelss(String repoPath, String relativeProject, String from) throws NoHeadException, GitAPIException {
 		List<GitTagModel> result = new ArrayList<>();
 		try {
-			Git git = Git.open(new File(repoPath));
-			RevWalk walk = new RevWalk(git.getRepository());
-			Map<String, Ref> tags = git.getRepository().getTags();
-			
+			// фильтр (если указан коммит с которого начинаем, или относительный путь
 			List<GitRevisionModel> revisionModels = null;
-			if (from != null) {
-				revisionModels = getAllRevisions(repoPath, from);
+			if (from != null || relativeProject != null) {
+				revisionModels = getAllRevisions(repoPath, relativeProject, from);
 			}
-			
-			for (Entry<String, Ref> entry : tags.entrySet()) {
-				Ref ref = entry.getValue();
-				RevObject revObj = walk.parseAny(ref.getObjectId());
-				int type = revObj.getType();
-				if (type == 4) {
-					RevTag revTag = walk.parseTag(ref.getObjectId());															
-					String commitName = revTag.getObject().getName();
 					
-					// если нужны теги с определенного коммита
-					if (from != null && !contains(revisionModels, revTag.getObject())) {
-						continue;
-					}
-					
-					GitTagModel tagModel = new GitTagModel(commitName, entry.getKey(), revTag);
-					result.add(tagModel);				
-				} 
+			Git git = Git.open(new File(repoPath));		
+			List<Ref> tags = git.tagList().call();
+			RevWalk walk = new RevWalk(git.getRepository());
+
+			for (Ref tag: tags) {
+			    String commitName = tag.getObjectId().getName();
+			    String tagName = tag.getName();
+			    if (tagName.startsWith("refs/tags/")) {
+			    	tagName = tagName.substring("refs/tags/".length());
+			    }
+				RevCommit revCommit = walk.parseCommit(tag.getObjectId());
+				commitName = revCommit.getId().getName();		
+				String fullMessage = revCommit.getFullMessage();			
+				if (revisionModels != null && !contains(revisionModels, revCommit.getId())) {
+					continue;
+				}
+				result.add(new GitTagModel(commitName, tagName, fullMessage));		    
 			}
 			walk.close();
 		} catch (IOException e) {
@@ -219,9 +217,9 @@ public class GITUtilities {
 		return result;
 	}
 	
-	private static boolean contains(List<GitRevisionModel> revisions, RevObject revObject) {
+	private static boolean contains(List<GitRevisionModel> revisions, ObjectId objectId) {
 		for (GitRevisionModel revision: revisions) {
-			if (revision.getRevCommit().getId().equals(revObject.getId())){
+			if (revision.getRevCommit().getId().getName().equals(objectId.getName())){
 				return true;
 			}
 		}
@@ -312,9 +310,23 @@ public class GITUtilities {
 	}
 	
 	public static List<GitRevisionModel> getAllRevisions(String repoPath, String from) throws IOException, NoHeadException, GitAPIException{		
+		return getAllRevisions(repoPath, null, from);
+	}
+	
+	/**
+	 * Получить историю
+	 * relativePath - относительный путь внутри репозитория, если null, то для всего репозитория
+	 * from - начиная с какого коммита, если null, то вся история
+	 */
+	public static List<GitRevisionModel> getAllRevisions(String repoPath, String relativePath, String from) throws IOException, NoHeadException, GitAPIException{		
 		List<GitRevisionModel> result = new ArrayList<>();
 		Git git = Git.open(new File(repoPath));
 		LogCommand logCommand = git.log(); 
+		
+		if (relativePath != null && !relativePath.isEmpty()) {
+			logCommand = logCommand.addPath(relativePath);
+		}
+		
 		//LogCommand logCommand = git.log().all();  // все коммиты для всех веток (в экспорте не требуется) 
 		Iterable<RevCommit> commits = logCommand.call();
 		
@@ -674,11 +686,8 @@ public class GITUtilities {
 		}
 	}
 	
-	
-
-	
 	/**
-	 * Возвращает текущий хэш
+	 * Возвращает текущий хэш 
 	 */
 	private static String getCurrentHash(Git git, String filePath) throws RevisionSyntaxException,
 			AmbiguousObjectException, IncorrectObjectTypeException, IOException, NoHeadException, GitAPIException {
@@ -711,7 +720,7 @@ public class GITUtilities {
 	/**
 	 * Возвращает Describe (для коммита в котором файл был изменен) либо null если нет репозитория
 	 */
-	public static String getDescribe(IDipDocumentElement dde) {
+	public static String getDescribe(IDipElement dde) {
 		Repository repository = dde.dipProject().getGitRepo();		
 		try {
 			if (repository != null) {
@@ -730,7 +739,7 @@ public class GITUtilities {
 	}
 	
 	
-	private static String getDescribe(Repository repo, String currentHash, IDipDocumentElement dde)
+	private static String getDescribe(Repository repo, String currentHash, IDipElement dde)
 			throws IOException, NoHeadException, GitAPIException {
 		String commitName = CommitCache.instance.getCommitChanged(dde.resource(), currentHash);
 		if (commitName == null) {
@@ -757,7 +766,7 @@ public class GITUtilities {
 	/**
 	 * Возвращает коммит в котором файл был изменен
 	 */
-	public static RevCommit getChangedCommit(Repository repo, IDipDocumentElement dde) throws IOException, NoHeadException, GitAPIException {
+	public static RevCommit getChangedCommit(Repository repo, IDipElement dde) throws IOException, NoHeadException, GitAPIException {
 		Git git = Git.open(repo.getDirectory().getParentFile());
 		String path = getRepoPath(repo, dde.resource());
 		path = path.replace('\\', '/');

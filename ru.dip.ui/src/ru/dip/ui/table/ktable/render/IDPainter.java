@@ -101,7 +101,7 @@ public class IDPainter {
 	}
 
 	private String getIncludeFolderLabel(IncludeFolder includeFolder) {
-		if (fTableComposite.isOneListMode()) {
+		if (fTableComposite.getTableSettings().isOneListMode()) {
 			String result = includeFolder.realtiveProjectIncludeName();
 			return result;
 		} else {
@@ -134,9 +134,9 @@ public class IDPainter {
 		IDipDocumentElement dipDocElement = getPresentation(element);
 		contentProvider.put(element, ContentType.FINDED_POINTS, null);
 		
-		if (fTableComposite.isFindMode() && getIdPoints(dipDocElement) != null) {
+		if (fTableComposite.getTableSettings().isFindMode() && getIdPoints(dipDocElement) != null) {
 			List<Point> namePoints = getIdPoints(dipDocElement);
-			if (fTableComposite.isOneListMode()) {
+			if (fTableComposite.getTableSettings().isOneListMode()) {
 				int delta = contentProvider.getText(element).length() - dipDocElement.name().length();
 				if (delta > 0) {
 					contentProvider.put(element, ContentType.FINDED_POINTS, namePoints.stream()
@@ -183,7 +183,7 @@ public class IDPainter {
 		if (dipDocElement instanceof IncludeFolder) {
 			return getIncludeFolderLabel((IncludeFolder) dipDocElement);
 		}
-		if (fTableComposite.isOneListMode()) {
+		if (fTableComposite.getTableSettings().isOneListMode()) {
 			return getRelativeProjectName(dipDocElement);
 		}
 		return getDipDocElementName(dipDocElement);
@@ -208,7 +208,7 @@ public class IDPainter {
 	
 	private boolean isNeedAppendHash(IDipDocumentElement dde) {
 		return (dde instanceof FormField || dde instanceof UnitPresentation) 
-				&& fTableComposite.isShowFormVersion();
+				&& fTableComposite.getTableSettings().isShowFormVersion();
 	}
 	
 	private String getNameWithHash(IDipDocumentElement dde, String name) {
@@ -299,7 +299,7 @@ public class IDPainter {
 	}
 	
 	private void applyFindPoints(IContentContainer tableElement, IDipDocumentElement dipDocElement, TextLayout layout) {
-		if (fTableComposite.isFindMode() && contentProvider.get(tableElement, ContentType.FINDED_POINTS, List.class) != null) {
+		if (fTableComposite.getTableSettings().isFindMode() && contentProvider.get(tableElement, ContentType.FINDED_POINTS, List.class) != null) {
 			@SuppressWarnings("unchecked")
 			List<Point> findedPoints = contentProvider.get(tableElement, ContentType.FINDED_POINTS, List.class); 
 			applyFindedPositionStyles(layout, findedPoints);
@@ -311,7 +311,7 @@ public class IDPainter {
 	 * Подсветка всех  найденных позиций
 	 */
 	private void applyFindedPositionStyles(TextLayout layout, List<Point> findedPoints) {
-		if (findedPoints != null && fTableComposite.isFindMode()) {
+		if (findedPoints != null && fTableComposite.getTableSettings().isFindMode()) {
 			for (Point p : findedPoints) {
 				layout.setStyle(GCUtils.FIND_POINTS_STYLE, p.x, p.y - 1);
 			}

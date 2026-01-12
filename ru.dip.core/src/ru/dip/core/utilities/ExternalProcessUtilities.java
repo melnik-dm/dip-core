@@ -43,7 +43,7 @@ public class ExternalProcessUtilities {
 			    outThread.join();
 				@SuppressWarnings("unused")
 				boolean result = process.waitFor(TIMEOUT, TimeUnit.SECONDS);
-				int n = process.exitValue();	
+				int n = process.exitValue();
 				if (n != 0) {
 
 					String errorMessage = ExternalProcessUtilities.getErrorMessage(process);					

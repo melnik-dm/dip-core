@@ -13,39 +13,7 @@
  *******************************************************************************/
 package ru.dip.ui.table.ktable.model;
 
-import java.util.List;
-
-import org.eclipse.swt.graphics.Color;
-
-import ru.dip.core.model.interfaces.IDipDocumentElementHolder;
-import ru.dip.core.utilities.ui.IBackground;
-
-public interface IDipTableElement extends IBackground, IContentContainer, IDipDocumentElementHolder {
-
-	//===================
-	// связанные элементы
-	
-	void setNumber(int i);
-
-	void setLinkedElements(List<IDipTableElement> currentElements);
-	
-	boolean isFirst();
-	
-	IDipTableElement startElement(HideElements exclude);
-	
-	List<IDipTableElement> allLinkedElements();
-
-	List<IDipTableElement> getLinkedElements();
-
-	IDipTableElement endElement(HideElements exclude);
-	
-	int getNumber();
-
-	boolean isLast();
-	
-	List<IDipTableElement> linkedWithibleElements();
-
-	//==============
+public interface IDipTableElement extends IDipDocTablePaintable, IPresentationElement, IidElement, INumberElement {
 	
 	ITableNode parent();
 
@@ -53,28 +21,4 @@ public interface IDipTableElement extends IBackground, IContentContainer, IDipDo
 	
 	boolean isVisible();
 	
-	//===============
-	// presentation
-		
-	void prepare(int i, IDipTableModel dipTableModel);
-	
-	boolean hasFontPresentation();
-
-	int height(IDipTableModel dipTableModel);
-	
-	void setCommentMainHeight(int i);
-	
-	int getCommentMainHeight();
-
-	Color idBackground();
-	
-	
-	//==============
-	// edit
-	
-	void up();
-
-	void down();
-
-	void delete();
 }

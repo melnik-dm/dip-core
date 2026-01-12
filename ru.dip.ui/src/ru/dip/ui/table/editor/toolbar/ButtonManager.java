@@ -45,6 +45,7 @@ import ru.dip.core.utilities.ui.WSelectionListener;
 import ru.dip.core.utilities.ui.swt.ColorProvider;
 import ru.dip.ui.Messages;
 import ru.dip.ui.export.Exporter;
+import ru.dip.ui.glossary.GlossaryDialog;
 import ru.dip.ui.imageview.ImagesView;
 import ru.dip.ui.imageview.TablesView;
 import ru.dip.ui.table.editor.DipTableEditor;
@@ -345,7 +346,7 @@ public class ButtonManager {
 				fFirstItem.setSelection(false);
 				fHideItem.setSelection(false);
 			}
-			fShowFormVersion.setSelection(fEditor.kTable().isShowFormVersion());
+			fShowFormVersion.setSelection(fEditor.kTable().getTableSettings().isShowFormVersion());
 		}
 	}
 	
@@ -539,8 +540,8 @@ public class ButtonManager {
 				fFixedCommentItem.setSelection(false);
 				fNotCommentItem.setSelection(false);
 			}
-			fMDCommentItem.setSelection(fEditor.kTable().isShowMdComment());
-			fStrictCommentsItem.setSelection(fEditor.kTable().isShowStrictMdComment());
+			fMDCommentItem.setSelection(fEditor.kTable().getTableSettings().isShowMdComment());
+			fStrictCommentsItem.setSelection(fEditor.kTable().getTableSettings().isShowStrictMdComment());
 		}
 	}
 	
@@ -722,9 +723,9 @@ public class ButtonManager {
 			Rectangle rect = item.getBounds();
 			Point pt = item.getParent().toDisplay(new Point(rect.x, rect.y));
 			fMenu.setLocation(pt.x, pt.y + rect.height);
-			boolean showNumeration = fEditor.kTable().isShowNumeration();
+			boolean showNumeration = fEditor.kTable().getTableSettings().isShowNumeration();
 			fNumerationItem.setSelection(showNumeration);
-			boolean formNumeration = fEditor.kTable().isShowFormNumeration();
+			boolean formNumeration = fEditor.kTable().getTableSettings().isShowFormNumeration();
 			fFormNumeration.setSelection(formNumeration);
 			fMenu.setVisible(true);
 		}
@@ -747,7 +748,7 @@ public class ButtonManager {
 			
 			@Override
 			public void widgetSelected(SelectionEvent e) {				
-				fEditor.kTable().doOpenGlossaryDialog();
+				GlossaryDialog.openGlossaryDialog(fEditor.dipProject(), fTableComposite.getShell());
 			}
 			
 		});
@@ -898,7 +899,7 @@ public class ButtonManager {
 					ShemaPropertiesDialog dialog = new ShemaPropertiesDialog(
 							fMenu.getShell(),
 							fEditor.getDipProject());
-					if (dialog.open() == Window.OK && fEditor.kTable().isFormShowPrefernciesEnable()) {						
+					if (dialog.open() == Window.OK && fEditor.kTable().getTableSettings().isFormShowPreferenciesEnable()) {						
 						fEditor.updater().updateFormElements(true);
 					}
 				}
@@ -912,7 +913,7 @@ public class ButtonManager {
 			Rectangle rect = item.getBounds();
 			Point pt = item.getParent().toDisplay(new Point(rect.x, rect.y));
 			fMenu.setLocation(pt.x, pt.y + rect.height);		
-			boolean enableFormShowPreferencies = fEditor.kTable().isFormShowPrefernciesEnable();
+			boolean enableFormShowPreferencies = fEditor.kTable().getTableSettings().isFormShowPreferenciesEnable();
 			fEnableItem.setSelection(enableFormShowPreferencies);
 			fMenu.setVisible(true);
 		}
@@ -1142,11 +1143,11 @@ public class ButtonManager {
 	}
 	
 	public void setTableModes() { 
-		setListMode(fEditor.kTable().isOneListMode());
-		setHighlightGlossMode(fEditor.kTable().isHighlightGloss());
-		setFixContentMode(fEditor.kTable().isFixedContent());
-		setCheckEnable(fEditor.kTable().isCheckSpellingEnable());
-		setHideDisableObjs(fEditor.kTable().isHideDisableObjs());
+		setListMode(fEditor.kTable().getTableSettings().isOneListMode());
+		setHighlightGlossMode(fEditor.kTable().getTableSettings().isHighlightGloss());
+		setFixContentMode(fEditor.kTable().getTableSettings().isFixedContent());
+		setCheckEnable(fEditor.kTable().getTableSettings().isCheckSpellingEnable());
+		setHideDisableObjs(fEditor.kTable().getTableSettings().isHideDisableObj());
 	}
 	
 	//============================

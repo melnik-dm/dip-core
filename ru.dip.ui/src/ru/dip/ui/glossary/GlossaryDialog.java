@@ -24,11 +24,23 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
+import ru.dip.core.model.DipProject;
 import ru.dip.core.model.glossary.GlossaryFolder;
 import ru.dip.core.utilities.ui.swt.ColorProvider;
 import ru.dip.ui.Messages;
 
 public class GlossaryDialog extends Dialog {
+		
+	public static void openGlossaryDialog(DipProject dipProject, Shell shell) {
+		GlossaryFolder glosFolder = dipProject.getGlossaryFolder();
+		if (glosFolder == null) {
+			return;
+		}
+		GlossaryDialog dialog = new GlossaryDialog(shell, glosFolder);
+		dialog.open();
+	}
+	
+	
 
 	// model
 	private GlossaryFolder fGlossFolder;

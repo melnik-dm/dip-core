@@ -16,6 +16,7 @@ package ru.dip.core.utilities;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -35,6 +36,13 @@ public class TagStringUtilities {
 
 	public static String lineSeparator() {
 		return LINESEPARATOR;
+	}
+	
+	/**
+	 * Вывод сообщения с параметром (для externalize strings)
+	 */
+	public static String format(String message, Object object) {
+		return MessageFormat.format(message, new Object[] { object});
 	}
 	
 	public static final String LINE_SPLIT_REGEX = "\r\n|\n";

@@ -171,7 +171,7 @@ public class MdActionInteractor {
 			if (needDelete) {
 				try {
 					DipUtilities.deleteElement(fMdUnit, false, getShell());
-					fSelectedElement.delete();
+					fSelectedElement.parent().delete(fSelectedElement);
 				} catch (DeleteDIPException e) {
 					WorkbenchUtitlities.openError(ERROR_SPLIT_TITLE, DELETE_SOURCE_FILE_ERROR);
 					e.printStackTrace();
@@ -323,7 +323,7 @@ public class MdActionInteractor {
 		void deleteUnit() {				
 			try {
 				DipUtilities.deleteElement(fMdUnit, false, getShell());
-				fSelectedElement.delete();			
+				fSelectedElement.parent().delete(fSelectedElement);
 			} catch (DeleteDIPException e) {
 				WorkbenchUtitlities.openError(ERROR_SPLIT_TITLE, DELETE_SOURCE_FILE_ERROR);
 				e.printStackTrace();
@@ -437,7 +437,7 @@ public class MdActionInteractor {
 			for (IDipDocumentElement unit: fSources) {
 				IDipTableElement element = fTableComposite.tableModel().findElement(unit);
 				TmpElement tmpElement = DipUtilities.deleteElement(unit, false, getShell());
-				element.delete();	
+				element.parent().delete(element);
 				tmpElements.add(tmpElement);
 			}
 			return tmpElements;

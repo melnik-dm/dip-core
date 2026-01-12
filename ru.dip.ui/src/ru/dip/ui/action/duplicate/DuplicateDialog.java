@@ -52,6 +52,7 @@ import ru.dip.core.model.DipProject;
 import ru.dip.core.model.interfaces.IDipElement;
 import ru.dip.core.utilities.DipUtilities;
 import ru.dip.core.utilities.ResourcesUtilities;
+import ru.dip.core.utilities.TagStringUtilities;
 import ru.dip.core.utilities.ui.CompositeFactory;
 import ru.dip.core.utilities.ui.swt.ColorProvider;
 import ru.dip.ui.Messages;
@@ -201,7 +202,7 @@ public class DuplicateDialog extends Dialog {
 			
 			@Override
 			public void linkActivated(HyperlinkEvent e) {
-				String message =  DeleteDialog.format(DeleteDialog.DeleteResourcesWizard_label_single, 
+				String message =  TagStringUtilities.format(DeleteDialog.DeleteResourcesWizard_label_single, 
 						resource);
 				boolean confirm = MessageDialog.openQuestion(getShell(), Messages.DuplicateDialog_Delete_question_title, message);
 				if (confirm) {

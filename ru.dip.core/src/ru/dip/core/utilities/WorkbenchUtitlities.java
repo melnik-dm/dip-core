@@ -501,7 +501,6 @@ public class WorkbenchUtitlities {
 		clipboard.setContents(data, transfers);
 	}
 	
-	
 	//=================================
 	// WorkbenchPart
 

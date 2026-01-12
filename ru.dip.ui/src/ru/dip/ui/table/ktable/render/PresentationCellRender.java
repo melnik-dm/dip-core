@@ -128,7 +128,7 @@ public class PresentationCellRender extends DipRender {
 	 */
 	private Rectangle computeIndentRectangle(Rectangle rect, int col, DipTableModel model, TableElement element, GC gc) {
 		Rectangle indentRect = new Rectangle(rect.x, rect.y, rect.width, rect.height);		
-		if (!fModel.tableComposite().isOneListMode()) {
+		if (!fModel.tableComposite().getTableSettings().isOneListMode()) {
 			int indent = 0;
 			if (col == 0) {
 				indent = ((DipTableModel) model).getIndent(element) * 16;

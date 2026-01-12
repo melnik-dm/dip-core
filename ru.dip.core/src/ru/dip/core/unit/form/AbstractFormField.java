@@ -67,7 +67,7 @@ public abstract class AbstractFormField extends UnitExtension implements IFormFi
 	
 	public String tablePresentation(IFormSettings formSettings,
 			MarkdownSettings mdSettings, int lineLength, boolean first, boolean last) {
-		clearTitlePoints();		
+		clearTitlePoints();
 		FormPresentationBuilder builder = new FormPresentationBuilder(this,
 				fMdFormatPoints, 
 				formSettings,

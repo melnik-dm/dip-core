@@ -13,15 +13,20 @@
  *******************************************************************************/
 package ru.dip.ui.table.ktable.actions.manager;
 
+
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 import ru.dip.core.model.interfaces.IDipDocumentElement;
 import ru.dip.core.utilities.DipUtilities;
-import ru.dip.ui.table.ktable.KDipTableSelector;
-import ru.dip.ui.table.ktable.KTableComposite;
 import ru.dip.ui.table.ktable.dialog.CopyIdDialog;
 
 public class CopyIdIneractor {
+	
+	private static final String COPY_REVISION_DIALOG_TITLE = " Copy ID (revision)";
+	private static final String COPY_ID_DIALOG_TITLE = " Copy ID";
+	private static final String COPY_RELATIVE_DIALOG_TITLE = " Copy relative path";
 
 	public static enum CopyIdType {
 		RELATIVE, FULL, REVISION;
@@ -33,73 +38,66 @@ public class CopyIdIneractor {
 				return FULL;
 			} else {
 				return REVISION;
-			}
+			}			
 		}		
 	}
-	
-	private final KTableComposite fTableComposite;
+		
 	private CopyIdDialog fCopyIdialog;
-
-	private static final String COPY_REVISION_DIALOG_TITLE = " Copy ID (revision)";
-	private static final String COPY_ID_DIALOG_TITLE = " Copy ID";
-	private static final String COPY_RELATIVE_DIALOG_TITLE = " Copy relative path";
+	private final Control fControl;
 	
-	public CopyIdIneractor(KTableComposite tableComposite) {
-		fTableComposite = tableComposite;
+	public CopyIdIneractor(Control tableComposite) {
+		fControl = tableComposite;
 	}
 	
-	public void doCopyID(int numberClickC) {
+	public void doCopyID(int numberClickC, IDipDocumentElement dde) {
 		if (numberClickC == 0) {
-			doCopyRelID();
+			doCopyRelID(dde);
 		} else if (numberClickC == 1) {
-			doCopyFullID();
+			doCopyFullID(dde);
 		} else {
-			doCopyFullRevisionID();
+			doCopyFullRevisionID(dde);
 		}
 	}
 	
-	public void doCopyID(CopyIdType idType) {
+	public void doCopyID(CopyIdType idType, IDipDocumentElement dde) {
 		switch (idType) {
 		case RELATIVE: {
-			doCopyRelID();
+			doCopyRelID(dde);
 			break;
 		}
 		case FULL: {
-			doCopyFullID();
+			doCopyFullID(dde);
 			break;
 		}
 		case REVISION: {
-			doCopyFullRevisionID();
+			doCopyFullRevisionID(dde);
 			break;
 		}
 		}
 	}
 	
-	private void doCopyFullRevisionID() {
-		IDipDocumentElement selectedElement = selector().getSelectedOneDipDocElement();
-		String id = DipUtilities.copyFullIdRevisionClipboard(selectedElement, display());
-		showMessage(COPY_REVISION_DIALOG_TITLE, id);	
+	private void doCopyFullRevisionID(IDipDocumentElement dde) {		
+		String id = DipUtilities.copyFullIdRevisionClipboard(dde, display());
+		showMessage(shell(), COPY_REVISION_DIALOG_TITLE, id);	
 	}
 	
-	private void doCopyFullID() {
-		IDipDocumentElement selectedElement = selector().getSelectedOneDipDocElement();
-		String id = DipUtilities.copyFullIdClipboard(selectedElement, display());
-		showMessage(COPY_ID_DIALOG_TITLE, id);
+	private void doCopyFullID(IDipDocumentElement dde) {
+		String id = DipUtilities.copyFullIdClipboard(dde, display());
+		showMessage(shell(), COPY_ID_DIALOG_TITLE, id);
 	}
 	
 
-	private void doCopyRelID() {
-		IDipDocumentElement selectedElement = selector().getSelectedOneDipDocElement();
-		String id = DipUtilities.copyRelativeIdClipboard(selectedElement, display());
-		showMessage(COPY_RELATIVE_DIALOG_TITLE, id);
+	private void doCopyRelID(IDipDocumentElement dde) {
+		String id = DipUtilities.copyRelativeIdClipboard(dde, display());
+		showMessage(shell(), COPY_RELATIVE_DIALOG_TITLE, id);
 	}
 	
-	private void showMessage(String actionName, String id) {			
+	private void showMessage(Shell shell, String actionName, String id) {			
 		if (fCopyIdialog != null && fCopyIdialog.isVisible()) {
 			fCopyIdialog.close();
 		}
 		
-		CopyIdDialog dialog  = new CopyIdDialog(fTableComposite.getShell(), actionName , id);
+		CopyIdDialog dialog  = new CopyIdDialog(shell, actionName , id);
 		fCopyIdialog = dialog;
 		fCopyIdialog.open();
 		
@@ -126,12 +124,12 @@ public class CopyIdIneractor {
 	//===============================
 	// getters
 	
-	private KDipTableSelector selector() {
-		return fTableComposite.selector();
-	}
-
 	private Display display() {
-		return fTableComposite.getDisplay();
+		return fControl.getDisplay();
+	}
+	
+	private Shell shell() {
+		return fControl.getShell();
 	}
 
 }

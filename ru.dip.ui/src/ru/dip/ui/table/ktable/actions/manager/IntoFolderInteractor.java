@@ -25,8 +25,8 @@ import ru.dip.core.exception.CopyDIPException;
 import ru.dip.core.exception.DeleteDIPException;
 import ru.dip.core.link.LinkInteractor;
 import ru.dip.core.model.DipUnit;
-import ru.dip.core.model.interfaces.IDipParent;
 import ru.dip.core.model.interfaces.IDipDocumentElement;
+import ru.dip.core.model.interfaces.IDipParent;
 import ru.dip.core.utilities.DipTableUtilities;
 import ru.dip.core.utilities.DipUtilities;
 import ru.dip.core.utilities.tmp.MoveResult;
@@ -119,12 +119,12 @@ public class IntoFolderInteractor {
 		if (sourceElement instanceof TableNode) {
 			IDipParent parent = (IDipParent) targetDipParent.getChild(sourcedReq.name());
 			ITableNode newNode = targetNode.addNewFolderToBegin(parent);
-			sourceElement.delete();
+			sourceElement.parent().delete(sourceElement);
 			return newNode;
 		} else {
 			DipUnit unit = (DipUnit) targetDipParent.getChild(sourcedReq.name());
 			IDipTableElement newElement = targetNode.addNewUnitToStart(unit);
-			sourceElement.delete();
+			sourceElement.parent().delete(sourceElement);
 			return newElement;
 		}
 	}

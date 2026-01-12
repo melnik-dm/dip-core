@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.eclipse.swt.graphics.Point;
@@ -37,7 +36,6 @@ import ru.dip.core.unit.form.AbstractFormField;
 import ru.dip.core.unit.form.FieldUnity;
 import ru.dip.core.unit.form.FormField;
 import ru.dip.core.unit.form.IFormSettings;
-import ru.dip.core.utilities.DipTableUtilities;
 import ru.dip.ui.table.table.TableModel;
 import ru.dip.ui.table.table.TableSettings;
 
@@ -83,7 +81,7 @@ public class TableNode extends TableElement implements ITableNode {
 		for (Object reqChild: reqChildren) {
 			if (reqChild instanceof IDipParent) {
 				TableNode node = new TableNode(fModel, (IDipParent) reqChild, this);
-				if (fModel.tableComposite().isOneListMode()) {
+				if (fModel.tableComposite().getTableSettings().isOneListMode()) {
 					node.setExpand(true);
 				}
 				fChildren.add(node);
@@ -214,11 +212,12 @@ public class TableNode extends TableElement implements ITableNode {
 		return children;
 	}
 	
-	private boolean filter(IDipTableElement element) {
+	@Override
+	public boolean filter(IDipTableElement element) {
 		if (element.isEmptyDescription()) {
 			return false;
 		}
-		if (fModel.tableComposite().isHideDisableObjs()  && element.isDisable()) {
+		if (fModel.tableComposite().getTableSettings().isHideDisableObj()  && element.isDisable()) {
 			return false;
 		}
 		return true;
@@ -234,7 +233,7 @@ public class TableNode extends TableElement implements ITableNode {
 			if (element.isEmptyDescription()) {
 				continue;
 			}
-			if (fModel.tableComposite().isHideDisableObjs()  && element.isDisable()) {
+			if (fModel.tableComposite().getTableSettings().isHideDisableObj()  && element.isDisable()) {
 				continue;
 			}	
 			
@@ -269,7 +268,7 @@ public class TableNode extends TableElement implements ITableNode {
 			if (element.isEmptyDescription()) {
 				continue;
 			}
-			if (fModel.tableComposite().isHideDisableObjs()  && element.isDisable()) {
+			if (fModel.tableComposite().getTableSettings().isHideDisableObj()  && element.isDisable()) {
 				continue;
 			}
 			if (element instanceof TableNode) {
@@ -360,11 +359,9 @@ public class TableNode extends TableElement implements ITableNode {
 	//==============================
 	// add TableNode
 	
-	
 	public ITableNode addNeightborFolder(IDipParent dipParent, boolean before) {
 		return parent().addNewNeightborFolder(dipParent, this, before);
 	}
-	
 	
 	public ITableNode addNewNeightborFolder(IDipParent dipParent, ITableNode select, boolean before) {
 		int index = fChildren.indexOf(select);
@@ -477,218 +474,6 @@ public class TableNode extends TableElement implements ITableNode {
 		}
 	}
 
-	//=============================
-	// navigation 
-	
-	/**
-	 * @param element - начальный элемент
-	 * @param hideElemetns - включать ли неотображаемые элементы
-	 * @return список всех связанных элементов для соответствующего файла или папки
-	 */
-	public List<IDipTableElement> linkedElements(IDipTableElement element, HideElements hideElements){
-		List<IDipTableElement> result = new ArrayList<>();
-		IDipTableElement startElement = element.startElement(hideElements);
-		result.add(startElement);
-		IDipDocumentElement current = startElement.dipResourceElement();
-		IDipTableElement next = nextAtomicElement(startElement, hideElements);
-		while (next != null && next.dipResourceElement() == current) {
-			result.add(next);
-			next = nextAtomicElement(next, hideElements);
-		}					
-		return result;
-	}
-	
-	/*
-	 *  Предыдущий атомарный элемент, может быть Description, UnitPresentation, IDipParent
-	 */
-	private IDipTableElement previousAtomicElement(IDipTableElement element, HideElements hideElements) {
-		int index = fChildren.indexOf(element);		
-		if (index <= 0) {
-			return null;
-		}
-		IDipTableElement previous =  fChildren.get(index - 1);
-		if (hideElements == HideElements.EXCLUDE &&!filter(previous)) {
-			return previousAtomicElement(previous, hideElements);
-		} 
-		return previous;
-	}
-	
-	/*
-	 *  Следующий атомарный элемент, может быть Description, UnitPresentation, IDipParent
-	 */
-	private IDipTableElement nextAtomicElement(IDipTableElement element, HideElements hideElements) {
-		int index = fChildren.indexOf(element);
-		if (fChildren.size() <= index +1) {
-			return null;
-		}
-		IDipTableElement next =  fChildren.get(index + 1);
-		if (hideElements == HideElements.EXCLUDE && !filter(next)) {
-			return nextAtomicElement(next, hideElements);
-		} 
-		return next;
-	}
-	
-	/*
-	 * Первый индекс для папки 
-	 */
-	private int getFirstParentIndex(){
-		for (int i = 0; i < fChildren.size(); i++){
-			IDipTableElement element = fChildren.get(i);
-			if (element instanceof TableNode){
-				return i;
-			}
-		}
-		return fChildren.size();
-	}
-	
-	/*
-	 * Последний индекс для файла 
-	 */
-	public int getLastUnitIndex() {
-		int result = -1;
-		for (int i = 0; i < fChildren.size(); i++){
-			IDipTableElement element = fChildren.get(i);
-			if (element instanceof TableNode){
-				return result;
-			} else {
-				result++;
-			}
-		}
-		return result;
-	}
-
-	/*
-	 * Индекс предыдущего элемента, для файлов определяет индекс для UnitPresentation 
-	 */
-	private int previousStartElementIndex(IDipTableElement startElement,  HideElements hideElements) {
-		IDipTableElement startPreviousElement = previousStartElement(startElement, hideElements);
-		if (startPreviousElement == null) {
-			return -1;
-		}		
-		return fChildren.indexOf(startPreviousElement);				
-	}
-	
-	/*
-	 * Предыдущий элемент (если файл, то UnitPresentation)
-	 */
-	private IDipTableElement previousStartElement(IDipTableElement startElement, HideElements hideElements) {
-		IDipTableElement previousElement = previousAtomicElement(startElement, HideElements.EXCLUDE);
-		if (previousElement == null) {
-			return null;
-		}
-		IDipTableElement startPreviousElement = startElement(previousElement, hideElements);
-		return startPreviousElement;
-	}
-	
-	public IDipTableElement startElement(IDipTableElement element, HideElements hideElements) {				
-		IDipDocumentElement currentUnit = element.dipResourceElement();
-		IDipTableElement currentElement = element;
-		IDipTableElement previous = previousAtomicElement(element, hideElements);
-		while (previous != null && currentUnit == previous.dipResourceElement()) {
-			currentElement = previous;
-			previous = previousAtomicElement(previous, hideElements);
-		}
-		return currentElement;
-	}
-	
-	public IDipTableElement endElement(IDipTableElement element, HideElements hideElements) {
-		IDipDocumentElement currentUnit = element.dipResourceElement();
-		IDipTableElement currentElement = element;
-		IDipTableElement next = nextAtomicElement(element, hideElements);
-		while (next != null && currentUnit == next.dipResourceElement()) {
-			currentElement = next;
-			next = nextAtomicElement(next, hideElements);
-		}
-		return currentElement;
-	}
-	
-	public int indexByReqIndex(IDipDocumentElement req, int index) {
-		if (index == 0) {
-			return 0;
-		}
-		IDipDocumentElement previousReq = DipTableUtilities.getPreviousElement(req);	
-		if (previousReq == null) {
-			return -1;
-		}
-		IDipTableElement previousElement = find(req.name());
-		if (previousElement == null) {
-			return -1;
-		}
-		return fChildren.indexOf(endElement(previousElement, HideElements.EXCLUDE)) + 1;
-	}
-	
-	//===============================
-	// find
-	
-	public IDipTableElement find(String name) {
-		for (IDipTableElement element: fChildren) {
-			if ((element.dipDocElement()).name().equals(name)) {
-				return startElement(element, HideElements.EXCLUDE);
-			}
-		}
-		return null;
-	}
-	
-	public IDipTableElement find(IDipDocumentElement dipDocElement) {
-		for (IDipTableElement element: fChildren) {
-			if (element.dipDocElement() == dipDocElement) {
-				return startElement(element, HideElements.EXCLUDE);
-			}
-		}
-		return null;
-	}
-	
-	public Optional<IDipTableElement> findByName(IDipDocumentElement dipDocElement) {
-		if (dipDocElement instanceof FormField) {
-			return findFieldByName((FormField) dipDocElement);
-		}
-		if (dipDocElement instanceof UnitDescriptionPresentation) {
-			return findDescriptionByName((UnitDescriptionPresentation) dipDocElement);
-		}
-		
-		String name = dipDocElement.name();
-		for (IDipTableElement element: fChildren) {
-			if (element.dipDocElement().name().equals(name)) {
-				return Optional.of(element);
-			}
-		}
-		return Optional.empty();
-	}
-	
-	private Optional<IDipTableElement> findFieldByName(FormField field){
-		String name = field.name();
-		for (IDipTableElement element: fChildren) {
-			if (!element.dipDocElement().name().equals(name)) {
-				continue;
-			}
-			if (element.isFormField()) {
-				if (((FormField)element.dipDocElement()).getField().getName().equals(field.getField().getName())) {
-					return Optional.of(element);
-				}
-			} else if (element.isFormUnityField()) {
-				for (FormField formField: ((FieldUnity) element.dipDocElement()).getFormFields()) {
-					if (formField.getField().getName().equals(field.getField().getName())) {
-						return Optional.of(element);
-					}
-				}
-			}
-		}
-		return Optional.empty();
-	}
-	
-	private Optional<IDipTableElement> findDescriptionByName(UnitDescriptionPresentation description){
-		String name = description.name();
-		for (IDipTableElement element: fChildren) {
-			if (!element.dipDocElement().name().equals(name)) {
-				continue;
-			}
-			if (element.isDescription()) {
-				return Optional.of(element);
-			}	
-		}
-		return Optional.empty();
-	}
-	
 	//===============================
 	// folding
 	
@@ -739,6 +524,7 @@ public class TableNode extends TableElement implements ITableNode {
 		return fExpandImageLoc;
 	}
 	
+	@Override
 	public List<IDipTableElement> children(){
 		return fChildren;
 	}
@@ -765,7 +551,6 @@ public class TableNode extends TableElement implements ITableNode {
 		return fModel;
 	}
 
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

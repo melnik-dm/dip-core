@@ -14,14 +14,5 @@
 package ru.dip.ui.table.ktable.model;
 
 public interface IPresentationElement {
-		
-	//=========================
-	// если сильный элемент состоит из нескольких, например: Unit = UnitPresentation + UnitDescription, или ReqFields
 	
-	boolean isFirst();
-
-	boolean isLast();
-
-	int getNumber();
-
 }
